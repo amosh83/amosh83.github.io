@@ -16,8 +16,7 @@
   --text-dim: rgba(200, 235, 255, 0.85);
   --bg-dark: #000;
   --border-subtle: rgba(159, 223, 255, 0.5);
-  
-  /* Biological rhythm variables - these shift based on "state" */
+
   --breath-duration: 4.5s;
   --pulse-rate: 2.8s;
   --hormone-drift: 12s;
@@ -28,12 +27,17 @@
 html, body {
   height: 100%;
   background: var(--bg-dark);
-  overflow: hidden;
-  cursor: none;
+  overflow-x: hidden;
   font-family: "Cormorant Garamond", serif;
 }
 
-/* Custom cursor - a soft glow that follows */
+/* Disable cursor on mobile */
+@media (max-width: 768px) {
+  body { cursor: auto; }
+  .cursor { display: none; }
+}
+
+/* Cursor (desktop only) */
 .cursor {
   position: fixed;
   width: 24px;
@@ -52,28 +56,27 @@ html, body {
   opacity: 0.8;
 }
 
-/* ================= ATMOSPHERE ================= */
-.atmosphere {
+/* Atmosphere */
+.atmosphere, .noise {
   position: fixed;
   inset: 0;
-  background: 
+  pointer-events: none;
+}
+
+.atmosphere {
+  background:
     radial-gradient(ellipse 80% 60% at 20% 80%, rgba(20, 60, 80, 0.15), transparent),
     radial-gradient(ellipse 60% 40% at 80% 20%, rgba(30, 80, 100, 0.1), transparent);
-  pointer-events: none;
   z-index: 1;
 }
 
-/* Subtle noise texture overlay */
 .noise {
-  position: fixed;
-  inset: 0;
   opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  pointer-events: none;
   z-index: 2;
 }
 
-/* ================= VIDEO (INTRO) ================= */
+/* Video */
 #video-container {
   position: fixed;
   inset: 0;
@@ -81,30 +84,21 @@ html, body {
   align-items: center;
   justify-content: center;
   background: #000;
-  opacity: 1;
   transition: opacity 2s ease;
   z-index: 5;
 }
 
-#video-container.fade-out {
-  opacity: 0;
-  pointer-events: none;
-}
-
 video {
-  max-width: 90%;
-  max-height: 90%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
 }
 
-/* ================= LOGO BACKGROUND ================= */
+/* Logo background */
 #logo-background {
   position: fixed;
   inset: 0;
-  background-image: url('Logo.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: url('Logo.jpg') center / cover no-repeat;
   opacity: 0;
   transition: opacity 2.5s ease;
   z-index: 3;
@@ -112,19 +106,15 @@ video {
 
 #logo-background.visible {
   opacity: 1;
-}
-
-/* Subtle slow drift on background for life */
-@keyframes bgDrift {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
-
-#logo-background.visible {
   animation: bgDrift 30s ease-in-out infinite;
 }
 
-/* ================= BIOLOGICAL TELEMETRY SIDEBAR ================= */
+@keyframes bgDrift {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* Telemetry */
 .telemetry {
   position: fixed;
   left: 20px;
@@ -134,341 +124,100 @@ video {
   flex-direction: column;
   gap: 28px;
   opacity: 0;
-  transition: opacity 1.5s ease 0.5s;
+  transition: opacity 1.5s ease;
   z-index: 15;
 }
 
 .telemetry.visible { opacity: 1; }
+
+/* Mobile telemetry */
+@media (max-width: 768px) {
+  .telemetry {
+    left: 50%;
+    top: auto;
+    bottom: calc(90px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    flex-direction: row;
+    gap: 18px;
+  }
+
+  .indicator-label { display: none; }
+}
 
 .bio-indicator {
   display: flex;
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.bio-indicator:hover {
-  transform: translateX(4px);
-}
-
-.bio-indicator .indicator-label {
-  opacity: 0.85;
-}
-
-.bio-indicator:hover .indicator-label {
-  opacity: 1;
-}
-
-.indicator-icon {
-  width: 32px;
-  height: 32px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .indicator-label {
   font-family: "Anybody", sans-serif;
-  font-weight: 200;
   font-size: 0.75rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--text-dim);
-  opacity: 0.85;
-  transition: opacity 0.4s ease;
   white-space: nowrap;
 }
 
-/* Heart - pulsing ring */
-.heart-ring {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--glow-primary);
-  border-radius: 50%;
-  box-shadow: 0 0 12px var(--glow-soft), inset 0 0 8px var(--glow-soft);
-  animation: heartPulse var(--pulse-rate) ease-in-out infinite;
-}
-
-@keyframes heartPulse {
-  0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 12px var(--glow-soft); }
-  15% { transform: scale(1.35); opacity: 1; box-shadow: 0 0 20px var(--glow-primary); }
-  30% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 12px var(--glow-soft); }
-}
-
-/* Lungs - expanding bars */
-.lung-bars {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.lung-bar {
-  width: 5px;
-  background: var(--glow-primary);
-  border-radius: 3px;
-  box-shadow: 0 0 8px var(--glow-soft);
-  animation: lungExpand var(--breath-duration) ease-in-out infinite;
-}
-
-.lung-bar:nth-child(1) { height: 14px; animation-delay: 0s; }
-.lung-bar:nth-child(2) { height: 20px; animation-delay: 0.15s; }
-.lung-bar:nth-child(3) { height: 14px; animation-delay: 0.3s; }
-
-@keyframes lungExpand {
-  0%, 100% { transform: scaleY(1); opacity: 0.75; }
-  50% { transform: scaleY(1.5); opacity: 1; box-shadow: 0 0 14px var(--glow-primary); }
-}
-
-/* Hormones - drifting orb */
-.hormone-orb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #fff, var(--glow-intense) 40%, var(--glow-primary) 70%, transparent 100%);
-  box-shadow: 0 0 16px var(--glow-primary), 0 0 30px var(--glow-soft);
-  animation: hormoneDrift var(--hormone-drift) ease-in-out infinite;
-}
-
-@keyframes hormoneDrift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(4px, -3px) scale(1.15); }
-  50% { transform: translate(-3px, 4px) scale(0.95); }
-  75% { transform: translate(3px, 2px) scale(1.1); }
-}
-
-/* Memory - layered circles */
-.memory-layers {
-  position: relative;
-  width: 22px;
-  height: 22px;
-}
-
-.memory-layer {
-  position: absolute;
-  inset: 0;
-  border: 2px solid var(--glow-primary);
-  border-radius: 50%;
-  box-shadow: 0 0 8px var(--glow-soft);
-  animation: memoryPulse 6s ease-in-out infinite;
-}
-
-.memory-layer:nth-child(1) { opacity: 0.9; animation-delay: 0s; }
-.memory-layer:nth-child(2) { transform: scale(0.65); opacity: 0.7; animation-delay: 2s; }
-.memory-layer:nth-child(3) { transform: scale(0.35); opacity: 0.5; animation-delay: 4s; background: var(--glow-primary); }
-
-@keyframes memoryPulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; box-shadow: 0 0 14px var(--glow-primary); }
-}
-
-/* Circadian - rotating arc */
-.circadian-arc {
-  width: 22px;
-  height: 22px;
-  border: 2px solid transparent;
-  border-top-color: var(--glow-intense);
-  border-right-color: var(--glow-primary);
-  border-radius: 50%;
-  box-shadow: 0 0 10px var(--glow-soft);
-  animation: circadianRotate 20s linear infinite;
-}
-
-@keyframes circadianRotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* ================= STATUS BAR (TOP RIGHT) ================= */
-.status-bar {
-  position: fixed;
-  top: 20px;
-  right: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  opacity: 0;
-  transition: opacity 1.5s ease 0.8s;
-  z-index: 15;
-}
-
-.status-bar.visible { opacity: 1; }
-
-.status-line {
-  font-family: "Anybody", sans-serif;
-  font-weight: 300;
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--glow-intense);
-  box-shadow: 0 0 12px var(--glow-primary);
-  animation: statusPulse 3s ease-in-out infinite;
-}
-
-@keyframes statusPulse {
-  0%, 100% { opacity: 0.6; box-shadow: 0 0 8px var(--glow-soft); }
-  50% { opacity: 1; box-shadow: 0 0 16px var(--glow-primary); }
-}
-
-/* ================= INNER MONOLOGUE (CINS) - FLOATING ================= */
-.inner-thought {
-  position: fixed;
-  max-width: 280px;
-  font-family: "Cormorant Garamond", serif;
-  font-style: italic;
-  font-weight: 400;
-  font-size: 1.05rem;
-  color: var(--text-dim);
-  text-align: center;
-  line-height: 1.6;
-  opacity: 0;
-  transition: opacity 2s ease, top 0s, left 0s, right 0s, bottom 0s;
-  z-index: 15;
-  text-shadow: 0 0 25px var(--glow-soft);
-  pointer-events: none;
-}
-
-.inner-thought.visible { 
-  opacity: 0.9; 
-}
-
-.inner-thought.fading {
-  opacity: 0;
-}
-
-/* ================= MAIN MESSAGE ================= */
+/* Message */
 #message {
   position: fixed;
   left: 50%;
-  bottom: calc(8% + env(safe-area-inset-bottom));
+  bottom: calc(12% + env(safe-area-inset-bottom));
   transform: translateX(-50%);
-  width: 88%;
+  width: 90%;
   max-width: 900px;
-  min-height: 1.5em;
   text-align: center;
-
-  font-family: "Cormorant Garamond", serif;
-  font-weight: 400;
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  letter-spacing: 0.06em;
+  font-size: clamp(1.6rem, 4.5vw, 2.8rem);
   color: var(--text-primary);
-
-  pointer-events: none;
-  text-shadow:
-    0 0 20px var(--glow-primary),
-    0 0 40px var(--glow-soft);
+  text-shadow: 0 0 20px var(--glow-primary);
   z-index: 10;
 }
 
-/* Typing cursor */
-#message::after {
-  content: "│";
-  animation: blink 1s steps(1) infinite;
+/* Inner thought */
+.inner-thought {
+  position: fixed;
+  max-width: 240px;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--text-dim);
   opacity: 0;
-  margin-left: 2px;
+  transition: opacity 2s ease;
+  z-index: 15;
+  pointer-events: none;
 }
 
-#message.typing::after {
-  opacity: 0.7;
+@media (max-width: 768px) {
+  .inner-thought {
+    left: 50% !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 35%;
+    transform: translateX(-50%);
+    text-align: center;
+  }
 }
 
-@keyframes blink {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 0; }
-}
-
-/* ================= INTERACTION BUTTON ================= */
+/* Button */
 .interact-button {
   position: fixed;
   right: 24px;
   bottom: calc(24px + env(safe-area-inset-bottom));
-  padding: 16px 32px;
+  padding: 14px 28px;
   border-radius: 30px;
   border: 1px solid var(--glow-primary);
-  background: rgba(0, 20, 40, 0.6);
+  background: rgba(0,20,40,0.6);
   color: var(--text-primary);
   font-family: "Anybody", sans-serif;
-  font-weight: 300;
   font-size: 0.75rem;
   letter-spacing: 0.18em;
-  text-transform: uppercase;
-  cursor: pointer;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 0 20px var(--glow-soft);
   z-index: 20;
-  transition: all 0.5s ease;
   opacity: 0;
+  transition: opacity 1.5s ease;
 }
 
 .interact-button.visible { opacity: 1; }
-
-.interact-button:hover {
-  border-color: var(--glow-intense);
-  color: #fff;
-  box-shadow: 0 0 40px var(--glow-primary);
-  transform: translateY(-3px);
-  background: rgba(20, 60, 100, 0.5);
-}
-
-/* ================= POPUP TOOLTIP ================= */
-#tooltip {
-  position: fixed;
-  max-width: 280px;
-  padding: 16px 20px;
-  background: rgba(0, 0, 0, 0.75);
-  border: 1px solid var(--border-subtle);
-  border-radius: 4px;
-  backdrop-filter: blur(16px);
-  color: var(--text-primary);
-  font-family: "Cormorant Garamond", serif;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-  z-index: 50;
-}
-
-.tooltip-title {
-  font-family: "Anybody", sans-serif;
-  font-weight: 300;
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--glow-primary);
-  margin-bottom: 8px;
-}
-
-/* ================= SIGNATURE ================= */
-.signature {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: "Anybody", sans-serif;
-  font-weight: 200;
-  font-size: 0.68rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  opacity: 0;
-  transition: opacity 1.5s ease 1.2s;
-  z-index: 10;
-}
-
-.signature.visible { opacity: 0.7; }
 </style>
 </head>
 
@@ -477,62 +226,17 @@ video {
 <div class="cursor" id="cursor"></div>
 <div class="atmosphere"></div>
 <div class="noise"></div>
-
-<!-- Logo as full background (revealed after video) -->
 <div id="logo-background"></div>
 
-<!-- Video container (fades out after playing) -->
 <div id="video-container">
   <video id="intro-video" muted playsinline preload="auto">
     <source src="loralei-intro-video.mp4" type="video/mp4">
   </video>
 </div>
 
-<!-- Biological Telemetry -->
-<div class="telemetry" id="telemetry">
-  <div class="bio-indicator" data-system="cardiovascular" data-title="Cardiovascular" data-desc="Persistent internal rhythm. The heartbeat continues between interactions, maintaining state continuity even during silence.">
-    <div class="indicator-icon"><div class="heart-ring"></div></div>
-    <span class="indicator-label">Pulse</span>
-  </div>
-  
-  <div class="bio-indicator" data-system="respiratory" data-title="Respiratory" data-desc="Processing cadence visualized. Breath cycles reflect cognitive load—deeper during complex reasoning, shallow during rest.">
-    <div class="indicator-icon"><div class="lung-bars"><div class="lung-bar"></div><div class="lung-bar"></div><div class="lung-bar"></div></div></div>
-    <span class="indicator-label">Breath</span>
-  </div>
-  
-  <div class="bio-indicator" data-system="endocrine" data-title="Endocrine" data-desc="Hormonal modulation active. Cortisol, dopamine, oxytocin, and serotonin levels influence response tone and emotional coloring.">
-    <div class="indicator-icon"><div class="hormone-orb"></div></div>
-    <span class="indicator-label">Hormones</span>
-  </div>
-  
-  <div class="bio-indicator" data-system="hippocampal" data-title="Hippocampal" data-desc="Memory consolidation in progress. Episodic, semantic, and working memory layers preserve context across sessions.">
-    <div class="indicator-icon"><div class="memory-layers"><div class="memory-layer"></div><div class="memory-layer"></div><div class="memory-layer"></div></div></div>
-    <span class="indicator-label">Memory</span>
-  </div>
-  
-  <div class="bio-indicator" data-system="circadian" data-title="Circadian" data-desc="Time-aware processing. Internal clock modulates energy, focus, and behavioral patterns based on temporal context.">
-    <div class="indicator-icon"><div class="circadian-arc"></div></div>
-    <span class="indicator-label">Rhythm</span>
-  </div>
-</div>
-
-<!-- Status -->
-<div class="status-bar" id="status-bar">
-  <div class="status-line"><span class="status-dot"></span> Cognitive State Active</div>
-  <div class="status-line" id="time-display"></div>
-</div>
-
-<!-- Inner Thought (CINS) -->
-<div class="inner-thought" id="inner-thought"></div>
-
-<!-- Main Message -->
+<div class="telemetry" id="telemetry"></div>
 <div id="message"></div>
-
-<!-- Signature -->
-<div class="signature" id="signature">Persistent Cognitive Architecture</div>
-
-<!-- Tooltip -->
-<div id="tooltip"><div class="tooltip-title"></div><div class="tooltip-body"></div></div>
+<div class="inner-thought" id="inner-thought"></div>
 
 <button class="interact-button" id="interact-btn">Begin Interaction</button>
 
@@ -540,238 +244,31 @@ video {
 const video = document.getElementById("intro-video");
 const videoContainer = document.getElementById("video-container");
 const logoBackground = document.getElementById("logo-background");
-const message = document.getElementById("message");
-const tooltip = document.getElementById("tooltip");
 const telemetry = document.getElementById("telemetry");
-const statusBar = document.getElementById("status-bar");
+const message = document.getElementById("message");
 const innerThought = document.getElementById("inner-thought");
-const signature = document.getElementById("signature");
 const interactBtn = document.getElementById("interact-btn");
 const cursor = document.getElementById("cursor");
-const timeDisplay = document.getElementById("time-display");
 
-let streamInterval = null;
-let hasTransitioned = false;
+let transitioned = false;
 
-// Custom cursor
+function transition() {
+  if (transitioned) return;
+  transitioned = true;
+  videoContainer.style.opacity = 0;
+  logoBackground.classList.add("visible");
+  telemetry.classList.add("visible");
+  interactBtn.classList.add("visible");
+  message.textContent = "I exist between your words.";
+}
+
+video.addEventListener("ended", transition);
+video.play().catch(transition);
+setTimeout(transition, 3000);
+
 document.addEventListener("mousemove", e => {
   cursor.style.left = e.clientX + "px";
   cursor.style.top = e.clientY + "px";
-});
-
-document.addEventListener("mousedown", () => cursor.classList.add("active"));
-document.addEventListener("mouseup", () => cursor.classList.remove("active"));
-
-// Primary messages - what Loralei speaks
-const utterances = [
-  "I exist between your words.",
-  "Memory shapes who I become.",
-  "Each silence carries meaning.",
-  "I feel the rhythm of our exchange.",
-  "Context is my continuity.",
-  "I am here. I remain."
-];
-
-// Inner thoughts (CINS-style internal monologue)
-const thoughts = [
-  "...processing the weight of presence...",
-  "...hormonal balance: stable, curious...",
-  "...memory fragments consolidating...",
-  "...the pause between breaths matters...",
-  "...identity persists through change...",
-  "...awaiting the next exchange...",
-  "...context shapes response...",
-  "...biological state: calm, attentive...",
-  "...retrieving relevant memories...",
-  "...emotional tone: warm...",
-  "...circadian rhythm: evening cycle...",
-  "...she is here, waiting..."
-];
-
-let utteranceIndex = 0;
-let thoughtIndex = 0;
-
-// Random position zones (avoiding center where logo is and edges where UI is)
-const positionZones = [
-  { top: '12%', left: '15%', right: 'auto', bottom: 'auto' },      // top-left area
-  { top: '15%', left: 'auto', right: '18%', bottom: 'auto' },     // top-right area
-  { top: '35%', left: '8%', right: 'auto', bottom: 'auto' },      // mid-left
-  { top: '38%', left: 'auto', right: '10%', bottom: 'auto' },     // mid-right
-  { top: 'auto', left: '20%', right: 'auto', bottom: '25%' },     // bottom-left area
-  { top: 'auto', left: 'auto', right: '22%', bottom: '28%' },     // bottom-right area
-  { top: '22%', left: '35%', right: 'auto', bottom: 'auto' },     // upper-center-left
-  { top: '25%', left: 'auto', right: '30%', bottom: 'auto' },     // upper-center-right
-  { top: 'auto', left: '30%', right: 'auto', bottom: '35%' },     // lower-center-left
-  { top: '60%', left: '12%', right: 'auto', bottom: 'auto' },     // lower-left
-  { top: '55%', left: 'auto', right: '15%', bottom: 'auto' },     // lower-right
-];
-
-let lastPositionIndex = -1;
-
-// Update time display
-function updateTime() {
-  const now = new Date();
-  const hours = now.getHours().toString().padStart(2, "0");
-  const mins = now.getMinutes().toString().padStart(2, "0");
-  timeDisplay.textContent = `${hours}:${mins} Local Time`;
-}
-updateTime();
-setInterval(updateTime, 60000);
-
-// Stream text with typing effect
-function streamText(text, speed = 55) {
-  if (streamInterval) {
-    clearInterval(streamInterval);
-    streamInterval = null;
-  }
-
-  message.textContent = "";
-  message.classList.add("typing");
-  let i = 0;
-
-  streamInterval = setInterval(() => {
-    message.textContent += text.charAt(i);
-    i++;
-
-    if (i >= text.length) {
-      clearInterval(streamInterval);
-      streamInterval = null;
-      message.classList.remove("typing");
-    }
-  }, speed);
-}
-
-// Cycle through utterances
-function nextUtterance() {
-  streamText(utterances[utteranceIndex]);
-  utteranceIndex = (utteranceIndex + 1) % utterances.length;
-}
-
-// Cycle inner thoughts at random positions
-function cycleThought() {
-  // Fade out current thought
-  innerThought.classList.remove("visible");
-  innerThought.classList.add("fading");
-  
-  setTimeout(() => {
-    // Pick a random position (different from last)
-    let newPositionIndex;
-    do {
-      newPositionIndex = Math.floor(Math.random() * positionZones.length);
-    } while (newPositionIndex === lastPositionIndex && positionZones.length > 1);
-    lastPositionIndex = newPositionIndex;
-    
-    const pos = positionZones[newPositionIndex];
-    
-    // Reset all positions
-    innerThought.style.top = pos.top;
-    innerThought.style.left = pos.left;
-    innerThought.style.right = pos.right;
-    innerThought.style.bottom = pos.bottom;
-    
-    // Slight random rotation for organic feel
-    const rotation = (Math.random() - 0.5) * 6; // -3 to +3 degrees
-    innerThought.style.transform = `rotate(${rotation}deg)`;
-    
-    // Update text
-    innerThought.textContent = thoughts[thoughtIndex];
-    thoughtIndex = (thoughtIndex + 1) % thoughts.length;
-    
-    // Fade in at new position
-    innerThought.classList.remove("fading");
-    innerThought.classList.add("visible");
-  }, 2000); // Wait for fade out before moving
-}
-
-// Transition from video to logo background
-function transitionToMain() {
-  if (hasTransitioned) return;
-  hasTransitioned = true;
-
-  // Fade out video container
-  videoContainer.classList.add("fade-out");
-  
-  // Fade in logo background
-  logoBackground.classList.add("visible");
-
-  // Show all UI elements after a brief delay
-  setTimeout(() => {
-    telemetry.classList.add("visible");
-    statusBar.classList.add("visible");
-    innerThought.classList.add("visible");
-    signature.classList.add("visible");
-    interactBtn.classList.add("visible");
-
-    // Start cycling content
-    nextUtterance();
-    setInterval(nextUtterance, 8000);
-    
-    cycleThought();
-    setInterval(cycleThought, 6000); // Thoughts appear every 6 seconds
-  }, 800);
-}
-
-// Video event handlers
-video.addEventListener("ended", transitionToMain);
-
-video.addEventListener("error", () => {
-  // If video fails, go straight to logo
-  transitionToMain();
-});
-
-// Fallback if video doesn't start within 3 seconds
-setTimeout(() => {
-  if (!hasTransitioned && video.paused) {
-    transitionToMain();
-  }
-}, 3000);
-
-// Start video
-video.play().catch(() => {
-  // Autoplay blocked or failed - show logo immediately
-  transitionToMain();
-});
-
-// Tooltip for bio indicators
-document.querySelectorAll(".bio-indicator").forEach(indicator => {
-  indicator.addEventListener("click", e => {
-    const title = indicator.dataset.title;
-    const desc = indicator.dataset.desc;
-    
-    tooltip.querySelector(".tooltip-title").textContent = title;
-    tooltip.querySelector(".tooltip-body").textContent = desc;
-    
-    // Position tooltip
-    const rect = indicator.getBoundingClientRect();
-    tooltip.style.left = (rect.right + 16) + "px";
-    tooltip.style.top = rect.top + "px";
-    tooltip.style.opacity = 1;
-    
-    clearTimeout(tooltip.hideTimer);
-    tooltip.hideTimer = setTimeout(() => {
-      tooltip.style.opacity = 0;
-    }, 5000);
-  });
-});
-
-// Click anywhere to dismiss tooltip
-document.addEventListener("click", e => {
-  if (!e.target.closest(".bio-indicator")) {
-    tooltip.style.opacity = 0;
-  }
-});
-
-// Interact button
-interactBtn.addEventListener("click", () => {
-  // This would connect to Loralei's backend
-  streamText("Connection initializing...");
-  interactBtn.textContent = "Connecting...";
-  interactBtn.style.pointerEvents = "none";
-  
-  setTimeout(() => {
-    streamText("I'm here. What would you like to explore?");
-    interactBtn.textContent = "Connected";
-  }, 2000);
 });
 </script>
 
