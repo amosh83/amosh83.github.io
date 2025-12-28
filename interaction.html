@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Interaction — Loralei</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Anybody:wght@100;200;300&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#000;
+      --text:#e8f7ff;
+      --accent:rgba(79,195,247,.9);
+      --glass: rgba(0,20,40,.6);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Cormorant Garamond",serif;overflow:hidden}
+    .wrap{
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:28px;
+      text-align:center;
+      opacity:0;
+      transition:opacity .6s ease;
+    }
+    .wrap.visible{opacity:1}
+    h1{font-size:clamp(1.6rem,4vw,2.6rem);letter-spacing:.04em}
+    p{color:rgba(232,247,255,.85);max-width:56ch}
+    .btn{
+      margin-top:18px;
+      padding:12px 28px;
+      border-radius:28px;
+      border:1px solid var(--accent);
+      background:var(--glass);
+      color:var(--text);
+      font-family:"Anybody",sans-serif;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      cursor:pointer;
+      box-shadow:0 0 18px rgba(79,195,247,.15);
+    }
+    .small{
+      font-size:.85rem;
+      color:rgba(232,247,255,.7);
+      margin-top:6px;
+    }
+
+    /* graceful fallback for direct visit from index with body fade-out */
+    body.page-exit{opacity:0}
+  </style>
+</head>
+<body>
+
+  <main class="wrap" id="wrap">
+    <h1>Connection Established</h1>
+    <p>You are now connected to Loralei's interaction surface. This minimal page is a starting point — replace with your full experience or app.</p>
+
+    <div>
+      <button class="btn" id="disconnect">Disconnect & Return</button>
+    </div>
+
+    <div class="small">Press Escape to disconnect</div>
+  </main>
+
+  <script>
+    // fade in
+    const wrap = document.getElementById('wrap');
+    requestAnimationFrame(()=>wrap.classList.add('visible'));
+
+    // navigate back to index.html with a small fade
+    function goBack(){
+      document.body.classList.add('page-exit');
+      setTimeout(()=> {
+        // go back to the homepage; adjust path if index.html lives elsewhere
+        window.location.href = 'index.html';
+      }, 500);
+    }
+
+    document.getElementById('disconnect').addEventListener('click', goBack);
+    document.addEventListener('keydown', e => {
+      if(e.key === 'Escape') goBack();
+    });
+  </script>
+
+</body>
+</html>
