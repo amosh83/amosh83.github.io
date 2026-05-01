@@ -804,6 +804,62 @@ footer nav a:hover { color: var(--glow-primary); }
 }
 .icon-dock.top    { top: 21%; }
 .icon-dock.bottom { bottom: 21%; }
+
+/* ───────────────────────────────────────────────────────────────
+   Wide-screen scaling — desktop monitors maximized.
+   The default desktop sizing was tuned for ~1280-1440px windows;
+   on 1600px+ the icons looked small clustered in the middle. Scale
+   gap, icon size, label size, and arch offset so the layout feels
+   proportional on big monitors. (Mobile rules stay untouched.)
+   ─────────────────────────────────────────────────────────────── */
+@media (min-width: 1200px) {
+  .icon-dock { gap: 56px; }
+  .dock-icon-shape { width: 68px; height: 68px; }
+  .dock-icon-shape svg { width: 32px; height: 32px; }
+  .dock-icon-label { font-size: 0.74rem; letter-spacing: 0.24em; }
+  .icon-dock.top    > .dock-icon:nth-child(1),
+  .icon-dock.top    > .dock-icon:nth-child(3) { --arch-y: 28px;  }
+  .icon-dock.bottom > .dock-icon:nth-child(1),
+  .icon-dock.bottom > .dock-icon:nth-child(3) { --arch-y: -28px; }
+}
+@media (min-width: 1600px) {
+  .icon-dock { gap: 84px; }
+  .dock-icon-shape { width: 76px; height: 76px; }
+  .dock-icon-shape svg { width: 36px; height: 36px; }
+  .dock-icon-label { font-size: 0.78rem; }
+  .icon-dock.top    > .dock-icon:nth-child(1),
+  .icon-dock.top    > .dock-icon:nth-child(3) { --arch-y: 34px;  }
+  .icon-dock.bottom > .dock-icon:nth-child(1),
+  .icon-dock.bottom > .dock-icon:nth-child(3) { --arch-y: -34px; }
+}
+@media (min-width: 2200px) {
+  .icon-dock { gap: 120px; }
+  .dock-icon-shape { width: 86px; height: 86px; }
+  .dock-icon-shape svg { width: 40px; height: 40px; }
+  .dock-icon-label { font-size: 0.82rem; }
+  .icon-dock.top    > .dock-icon:nth-child(1),
+  .icon-dock.top    > .dock-icon:nth-child(3) { --arch-y: 40px;  }
+  .icon-dock.bottom > .dock-icon:nth-child(1),
+  .icon-dock.bottom > .dock-icon:nth-child(3) { --arch-y: -40px; }
+}
+
+/* Telemetry + status scale with viewport too */
+@media (min-width: 1200px) {
+  .telemetry { gap: 36px; left: 36px; }
+  .indicator-icon { width: 38px; height: 38px; }
+  .indicator-label { font-size: 0.82rem; letter-spacing: 0.18em; }
+  .heart-ring { width: 22px; height: 22px; }
+  .hormone-orb { width: 22px; height: 22px; }
+  .memory-layers, .circadian-arc { width: 26px; height: 26px; }
+  .status-bar { right: 32px; top: 28px; gap: 10px; }
+  .status-line { font-size: 0.76rem; }
+}
+@media (min-width: 1600px) {
+  .telemetry { gap: 44px; left: 56px; }
+  .indicator-label { font-size: 0.88rem; }
+  .status-bar { right: 48px; top: 36px; }
+  .status-line { font-size: 0.82rem; }
+}
 .icon-dock.visible { opacity: 1; }
 
 .dock-icon {
