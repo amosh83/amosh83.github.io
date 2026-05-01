@@ -349,6 +349,7 @@ video { max-width: 90%; max-height: 90%; object-fit: contain; }
   border-color: var(--border-subtle);
   box-shadow: 0 0 14px var(--glow-faint);
 }
+.btn-mobile-only { display: none; }
 
 /* Bottom-right interaction button (kept on hero) */
 .interact-button {
@@ -657,17 +658,143 @@ footer nav a {
 }
 footer nav a:hover { color: var(--glow-primary); }
 
-/* Mobile */
+/* ───────────────────────────────────────────────────────────────
+   MOBILE — aggressive simplification
+   The desktop hero packs telemetry, status bar, floating thoughts,
+   typewriter, tagline, two CTAs, signature, scroll-cue, and an
+   interact button. Below 720px viewport that all collides. We hide
+   the decorative elements and rebuild the hero as a clean stacked
+   layout: clock → message → tagline → CTA stack.
+   ─────────────────────────────────────────────────────────────── */
 @media (max-width: 720px) {
-  .telemetry { left: 12px; gap: 18px; }
-  .indicator-label { font-size: 0.6rem; letter-spacing: 0.12em; }
-  .status-bar { right: 16px; top: 14px; }
-  .interact-button { right: 14px; bottom: 14px; padding: 12px 22px; font-size: 0.65rem; }
+  /* Touch devices: restore native cursor, hide custom cursor */
+  html, body, .hero { cursor: auto; }
+  .cursor { display: none; }
+
+  /* Hide decorative-only hero elements that overlap on small screens */
+  .telemetry { display: none; }
+  .inner-thought { display: none; }
+  .signature { display: none; }
   .scroll-cue { display: none; }
-  #message { bottom: 30%; }
-  .hero-tagline { bottom: 20%; padding: 0 28px; }
-  .cta-row { bottom: 11%; flex-direction: column; align-items: center; }
-  .section { padding: 80px 6vw 64px; }
+
+  /* Minimal status (clock) — top right, smaller */
+  .status-bar { top: 12px; right: 14px; gap: 4px; }
+  .status-bar .status-line {
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+  }
+
+  /* Hero: vertical stack, content centered */
+  #message {
+    top: 18%;
+    bottom: auto;
+    font-size: clamp(1.45rem, 5.6vw, 2rem);
+    line-height: 1.3;
+    padding: 0 22px;
+    width: 100%;
+    text-shadow: 0 0 14px var(--glow-primary), 0 0 28px var(--glow-soft);
+  }
+  .hero-tagline {
+    bottom: auto;
+    top: 48%;
+    transform: translate(-50%, -50%);
+    padding: 0 26px;
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+
+  /* Stacked CTA — replaces the floating interact button on mobile */
+  .cta-row {
+    bottom: 6%;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: column;
+    gap: 10px;
+    width: 88%;
+    align-items: stretch;
+  }
+  .cta-row .btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    padding: 13px 20px;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+  }
+  .cta-row .btn-mobile-only {
+    display: inline-flex;
+    background: rgba(0, 40, 80, 0.55);
+    border-color: var(--glow-intense);
+  }
+
+  /* Hide the desktop bottom-right interact button — replaced by stacked CTA */
+  .interact-button { display: none; }
+
+  /* Section sizing */
+  .section { padding: 64px 6vw 56px; }
+  .eyebrow { font-size: 0.62rem; letter-spacing: 0.24em; margin-bottom: 16px; }
+  .section h2 {
+    font-size: clamp(1.6rem, 6vw, 2.1rem);
+    margin-bottom: 14px;
+  }
+  .section .lead {
+    font-size: 1.02rem;
+    line-height: 1.65;
+    margin-bottom: 24px;
+  }
+  .section p {
+    font-size: 0.98rem;
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  /* Portrait subsections */
+  .subsection { margin-top: 36px; padding-top: 22px; }
+  .subsection:first-of-type { margin-top: 32px; }
+  .subsection-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.24em;
+    margin-bottom: 12px;
+  }
+
+  /* Closing block */
+  .section .closing { padding: 22px 18px; margin-top: 44px; }
+  .section .closing p { font-size: 1rem; line-height: 1.7; }
+
+  /* Architecture cards stack cleanly */
+  .arch-grid { gap: 14px; margin-top: 24px; }
+  .arch-card { padding: 20px 18px; }
+  .arch-card .arch-label { font-size: 0.58rem; letter-spacing: 0.22em; margin-bottom: 8px; }
+  .arch-card h3 { font-size: 1.18rem; margin-bottom: 8px; }
+  .arch-card p { font-size: 0.94rem; line-height: 1.65; }
+
+  /* About Joseph block */
+  .creator-block { gap: 18px; }
+  .creator-block .creator-quote {
+    padding-left: 16px;
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+
+  /* Footer */
+  footer { padding: 40px 6vw 28px; }
+  footer .inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  footer .legal { font-size: 0.6rem; letter-spacing: 0.18em; }
+  footer nav { flex-wrap: wrap; gap: 14px; }
+  footer nav a { font-size: 0.6rem; letter-spacing: 0.18em; }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  #message { font-size: 1.3rem; top: 16%; padding: 0 18px; }
+  .hero-tagline { font-size: 0.92rem; padding: 0 22px; }
+  .cta-row { width: 92%; }
+  .section { padding: 52px 5vw 48px; }
+  .section h2 { font-size: 1.45rem; }
 }
 </style>
 </head>
@@ -732,6 +859,7 @@ footer nav a:hover { color: var(--glow-primary); }
   <div class="cta-row" id="cta-row">
     <a href="#who" class="btn">Meet Loralei</a>
     <a href="#architecture" class="btn btn-ghost">How She Works</a>
+    <button type="button" class="btn btn-mobile-only" id="interact-btn-mobile">Begin Interaction</button>
   </div>
 
   <div class="signature" id="signature">Persistent Cognitive Architecture</div>
@@ -1592,25 +1720,34 @@ document.addEventListener("click", e => {
   if (!e.target.closest(".bio-indicator")) tooltip.style.opacity = 0;
 });
 
-/* Begin Interaction → demo chat */
-interactBtn.addEventListener("click", () => {
+/* Begin Interaction → demo chat (both desktop floating btn and mobile stacked btn) */
+function beginInteraction(triggerBtn) {
   streamText("Opening the channel...");
-  interactBtn.textContent  = "Connecting...";
-  interactBtn.style.pointerEvents = "none";
+  if (triggerBtn) {
+    triggerBtn.textContent = "Connecting...";
+    triggerBtn.style.pointerEvents = "none";
+  }
   setTimeout(() => { window.location.href = DEMO_URL; }, 900);
-});
+}
+interactBtn.addEventListener("click", () => beginInteraction(interactBtn));
+const interactBtnMobile = document.getElementById("interact-btn-mobile");
+if (interactBtnMobile) {
+  interactBtnMobile.addEventListener("click", () => beginInteraction(interactBtnMobile));
+}
 
-/* Hide hero-only fixed UI when scrolling past hero */
+/* Hide hero-only fixed UI when scrolling past hero (desktop only — hero
+   is `position: relative` inside the hero section so on mobile most of
+   these elements are display:none and the manipulation is harmless). */
 const heroEl = document.getElementById("hero");
 function onScroll() {
   const past = window.scrollY > (heroEl.offsetHeight * 0.75);
   const hide = past;
   for (const el of [telemetry, statusBar, innerThought, heroTagline, ctaRow, signature, scrollCue, interactBtn, message, logoBackground]) {
+    if (!el) continue;
     el.style.opacity = hide ? "0" : "";
     el.style.pointerEvents = hide ? "none" : "";
   }
-  cursor.style.opacity = hide ? "0" : "";
-  document.body.style.cursor = hide ? "auto" : "none";
+  if (cursor) cursor.style.opacity = hide ? "0" : "";
 }
 window.addEventListener("scroll", onScroll, { passive: true });
 </script>
