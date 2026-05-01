@@ -110,10 +110,9 @@ video { max-width: 90%; max-height: 90%; object-fit: contain; }
   padding-bottom: 24vh;
   /* Desktop full-bleed background (hidden on mobile via media query) */
   background-image: url('Logo-desktop.jpg');
-  background-size: 88%;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-color: var(--bg-dark);
   opacity: 0;
   transition: opacity 2.5s ease;
 }
@@ -910,12 +909,11 @@ footer .legal {
     text-align: center;
     line-height: 1.2;
   }
-  /* Mobile: portrait Logo.jpg as background, slightly smaller than
-     full-bleed so there's a thin breathing margin. The image's dark
-     navy bleeds into the page background seamlessly. */
+  /* Mobile: full-bleed portrait Logo.jpg as background (cover). Hide
+     the inline img so the bg image is the only logo visible. */
   .logo-frame {
     background-image: url('Logo.jpg');
-    background-size: 92%;
+    background-size: cover;
     background-position: center;
     padding-bottom: 0;
     padding-top: 0;
