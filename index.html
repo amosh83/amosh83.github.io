@@ -1699,14 +1699,14 @@ function transitionToMain() {
   logoBackground.classList.add("visible");
 
   setTimeout(() => {
-    telemetry.classList.add("visible");
-    statusBar.classList.add("visible");
-    innerThought.classList.add("visible");
-    heroTagline.classList.add("visible");
-    ctaRow.classList.add("visible");
-    signature.classList.add("visible");
-    if (iconDock) iconDock.classList.add("visible");
-    scrollCue.classList.add("visible");
+    if (telemetry)    telemetry.classList.add("visible");
+    if (statusBar)    statusBar.classList.add("visible");
+    if (innerThought) innerThought.classList.add("visible");
+    if (heroTagline)  heroTagline.classList.add("visible");
+    if (ctaRow)       ctaRow.classList.add("visible");
+    if (signature)    signature.classList.add("visible");
+    if (iconDock)     iconDock.classList.add("visible");
+    if (scrollCue)    scrollCue.classList.add("visible");
 
     nextUtterance();
     setInterval(nextUtterance, 8000);
