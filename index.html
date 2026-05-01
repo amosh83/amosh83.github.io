@@ -135,12 +135,13 @@ video { max-width: 90%; max-height: 90%; object-fit: contain; }
 }
 @keyframes bgDrift { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
 
-/* Telemetry sidebar (left) */
+/* Telemetry sidebar (left) — hidden for now per Joseph's request */
 .telemetry {
+  display: none;
   position: absolute;
   left: 20px; top: 50%;
   transform: translateY(-50%);
-  display: flex; flex-direction: column; gap: 28px;
+  flex-direction: column; gap: 28px;
   opacity: 0;
   transition: opacity 1.5s ease 0.5s;
   z-index: 15;
@@ -1106,10 +1107,11 @@ footer .legal {
 }
 
 
-/* Language picker */
+/* Language picker — top-left (telemetry sidebar is hidden, so this
+   corner is free; keeps the picker out of the clock's lane top-right) */
 .lang-picker {
   position: absolute;
-  top: 56px; right: 24px;
+  top: 22px; left: 24px;
   display: flex;
   gap: 8px;
   opacity: 0;
@@ -1139,47 +1141,12 @@ footer .legal {
   box-shadow: 0 0 12px var(--glow-soft);
 }
 @media (max-width: 720px) {
-  .lang-picker { top: 50px; right: 14px; gap: 6px; }
+  .lang-picker { top: 14px; left: 14px; gap: 6px; }
   .lang-btn { font-size: 0.55rem; padding: 3px 8px; letter-spacing: 0.14em; }
 }
 
 
-/* Language picker */
-.lang-picker {
-  position: absolute;
-  top: 56px; right: 24px;
-  display: flex;
-  gap: 8px;
-  opacity: 0;
-  transition: opacity 1.5s ease 1.2s;
-  z-index: 18;
-}
-.lang-picker.visible { opacity: 1; }
-.lang-btn {
-  background: rgba(0, 20, 40, 0.45);
-  border: 1px solid var(--border-faint);
-  border-radius: 14px;
-  padding: 4px 10px;
-  font-family: "Anybody", sans-serif;
-  font-weight: 300;
-  font-size: 0.6rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(8px);
-}
-.lang-btn:hover { color: var(--text-main); border-color: var(--border-subtle); }
-.lang-btn.active {
-  color: #7fdcff;
-  border-color: var(--glow-primary);
-  box-shadow: 0 0 12px var(--glow-soft);
-}
-@media (max-width: 720px) {
-  .lang-picker { top: 50px; right: 14px; gap: 6px; }
-  .lang-btn { font-size: 0.55rem; padding: 3px 8px; letter-spacing: 0.14em; }
-}
+
 
 /* ───────────────────────────────────────────────────────────────
    MOBILE — aggressive simplification
