@@ -695,18 +695,19 @@ footer nav a:hover { color: var(--glow-primary); }
 .icon-dock {
   position: absolute;
   left: 50%;
-  bottom: 9%;
   transform: translateX(-50%);
   display: flex;
-  gap: 28px;
+  gap: 36px;
   align-items: flex-start;
   justify-content: center;
-  flex-wrap: nowrap;            /* one clean row on desktop */
+  flex-wrap: nowrap;            /* one clean row of 3 */
   max-width: 96vw;
   opacity: 0;
   transition: opacity 1.5s ease 1.4s;
   z-index: 20;
 }
+.icon-dock.top    { top: 16%; }
+.icon-dock.bottom { bottom: 16%; }
 .icon-dock.visible { opacity: 1; }
 
 .dock-icon {
@@ -726,8 +727,8 @@ footer nav a:hover { color: var(--glow-primary); }
 .dock-icon:active { transform: translateY(-1px) scale(0.98); }
 
 .dock-icon-shape {
-  width: 48px;
-  height: 48px;
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -739,8 +740,8 @@ footer nav a:hover { color: var(--glow-primary); }
   transition: box-shadow 0.4s ease, border-color 0.4s ease;
 }
 .dock-icon-shape svg {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   stroke: var(--glow-intense);
   fill: none;
   stroke-width: 1.4;
@@ -750,7 +751,7 @@ footer nav a:hover { color: var(--glow-primary); }
 .dock-icon-label {
   font-family: "Anybody", sans-serif;
   font-weight: 200;
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--text-dim);
@@ -885,24 +886,23 @@ footer .legal {
 /* Mobile dock tweaks — 3-column grid (2 rows × 3 icons) */
 @media (max-width: 720px) {
   .icon-dock {
-    display: grid;
-    grid-template-columns: repeat(3, 78px);
-    gap: 14px 10px;
-    /* Anchor with fixed-px clearance from the footer so iOS Safari's
-       collapsing URL bar doesn't squeeze the layout. */
-    bottom: calc(48px + env(safe-area-inset-bottom));
-    max-width: none;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 22px;
+    max-width: 96vw;
   }
-  .dock-icon { gap: 5px; }
-  .dock-icon-shape { width: 40px; height: 40px; }
-  .dock-icon-shape svg { width: 18px; height: 18px; }
+  .icon-dock.top    { top: calc(64px + env(safe-area-inset-top)); }
+  .icon-dock.bottom { bottom: calc(56px + env(safe-area-inset-bottom)); }
+  .dock-icon { gap: 6px; }
+  .dock-icon-shape { width: 50px; height: 50px; }
+  .dock-icon-shape svg { width: 22px; height: 22px; }
   .dock-icon-label {
-    font-size: 0.48rem;
+    font-size: 0.52rem;
     letter-spacing: 0.12em;
-    white-space: normal;
+    white-space: nowrap;
     text-align: center;
     line-height: 1.2;
-    max-width: 78px;
   }
   /* Mobile: full-bleed portrait Logo.jpg as background (cover). Hide
      the inline img so the bg image is the only logo visible. */
@@ -1121,8 +1121,9 @@ footer .legal {
     that doesn&rsquo;t reset between conversations.
   </p>
 
-  <!-- Icon dock — opens each section as a zooming modal -->
-  <nav class="icon-dock" id="icon-dock" aria-label="Sections">
+  <!-- Icon docks — split: 3 above the LORALEI text, 3 below.
+       Each click opens that section as a zooming modal. -->
+  <nav class="icon-dock top" aria-label="Sections (top)">
     <button class="dock-icon" data-section="who-is-loralei" aria-label="Portrait">
       <span class="dock-icon-shape">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="2"/></svg>
@@ -1141,6 +1142,9 @@ footer .legal {
       </span>
       <span class="dock-icon-label">Origin</span>
     </button>
+  </nav>
+
+  <nav class="icon-dock bottom" aria-label="Sections (bottom)">
     <button class="dock-icon" data-section="architecture" aria-label="Architecture">
       <span class="dock-icon-shape">
         <svg viewBox="0 0 24 24"><path d="M4 8 L12 4 L20 8 L12 12 Z"/><path d="M4 14 L12 10 L20 14 L12 18 Z"/><path d="M4 20 L12 16 L20 20"/></svg>
@@ -1809,7 +1813,7 @@ function transitionToMain() {
     if (heroTagline)  heroTagline.classList.add("visible");
     if (ctaRow)       ctaRow.classList.add("visible");
     if (signature)    signature.classList.add("visible");
-    if (iconDock)     iconDock.classList.add("visible");
+    iconDocks.forEach(d => d.classList.add("visible"));
     if (scrollCue)    scrollCue.classList.add("visible");
 
     nextUtterance();
@@ -1869,7 +1873,7 @@ window.addEventListener("scroll", onScroll, { passive: true });
 /* ═════════════════════════════════════════════════════════════════
    ICON DOCK + MODAL — zoom from icon into modal, zoom back on close.
    ═════════════════════════════════════════════════════════════════ */
-const iconDock     = document.getElementById("icon-dock");
+const iconDocks    = document.querySelectorAll(".icon-dock");
 const modalEl      = document.getElementById("modal");
 const modalOverlay = document.getElementById("modal-overlay");
 const modalBody    = document.getElementById("modal-body");
@@ -1925,15 +1929,15 @@ function closeModal() {
   }, 600);
 }
 
-if (iconDock) {
-  iconDock.addEventListener("click", e => {
+iconDocks.forEach(dock => {
+  dock.addEventListener("click", e => {
     const btn = e.target.closest(".dock-icon");
     if (!btn) return;
     const sectionId = btn.getAttribute("data-section");
     if (!sectionId) return;
     openModalFromIcon(btn, sectionId);
   });
-}
+});
 
 if (modalClose) modalClose.addEventListener("click", closeModal);
 if (modalOverlay) modalOverlay.addEventListener("click", closeModal);
