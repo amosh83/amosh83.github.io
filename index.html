@@ -1673,6 +1673,13 @@ footer .legal {
 </footer>
 
 
+<!-- Modal — must be in DOM before the <script> below queries for it -->
+<div class="modal-overlay" id="modal-overlay" aria-hidden="true"></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+  <div class="modal-body" id="modal-body"></div>
+</div>
+
 <script>
 /* ═════════════════════════════════════════════════════════════════
    CONFIG — interaction button removed for now; will be wired later.
@@ -1934,48 +1941,16 @@ function closeModal() {
   }, 600);
 }
 
-// ─── TEMPORARY DEBUG OVERLAY ──────────────────────────────────────
-// Shows the last few events at the bottom of the screen so we can
-// see what's happening when icons are tapped. Remove once dock works.
-const _dbg = document.createElement("div");
-_dbg.style.cssText = "position:fixed;left:8px;bottom:34px;right:8px;z-index:9999;font:600 11px/1.35 monospace;color:#7fdcff;background:rgba(0,30,55,0.85);border:1px solid #2cb3ff;border-radius:4px;padding:6px 8px;max-height:38vh;overflow:hidden;pointer-events:none;white-space:pre-wrap;";
-_dbg.id = "debug-strip";
-document.body.appendChild(_dbg);
-const _dbgLog = (msg) => {
-  const t = new Date();
-  const ts = String(t.getMinutes()).padStart(2,"0") + ":" + String(t.getSeconds()).padStart(2,"0") + "." + String(t.getMilliseconds()).padStart(3,"0");
-  _dbg.textContent = ts + "  " + msg + "\n" + _dbg.textContent;
-  if (_dbg.textContent.length > 1200) _dbg.textContent = _dbg.textContent.slice(0, 1200);
-};
-_dbgLog("DEBUG ON · iconDocks=" + iconDocks.length + " · reservoir=" + (reservoir ? "ok" : "MISSING") + " · modalEl=" + (modalEl ? "ok" : "MISSING"));
-
-// Capture EVERY click to see if events fire at all on iOS Safari
+// Document-level click delegation — bullet-proof against any per-element
+// listener-attachment timing or iOS Safari closest()-on-SVG quirks.
 document.addEventListener("click", e => {
-  const tag = e.target.tagName + (e.target.className ? "." + String(e.target.className).split(" ").slice(0,2).join(".") : "");
-  _dbgLog("CLICK target=" + tag);
   const btn = e.target && e.target.closest && e.target.closest(".dock-icon");
-  if (!btn) { _dbgLog("  (no .dock-icon ancestor)"); return; }
+  if (!btn) return;
   const sectionId = btn.getAttribute("data-section");
-  _dbgLog("  → dock-icon section=" + sectionId);
   if (!sectionId) return;
   e.preventDefault();
-  try {
-    openModalFromIcon(btn, sectionId);
-    _dbgLog("  ✓ openModalFromIcon called");
-  } catch (err) {
-    _dbgLog("  ✗ ERROR " + err.message);
-  }
-}, true);  // capture phase — before any other handler can swallow it
-
-// Touch listeners as fallback (some iOS configs miss synthetic clicks)
-document.addEventListener("touchend", e => {
-  const t = e.changedTouches && e.changedTouches[0];
-  if (!t) return;
-  const el = document.elementFromPoint(t.clientX, t.clientY);
-  const btn = el && el.closest && el.closest(".dock-icon");
-  if (!btn) return;
-  _dbgLog("TOUCHEND → " + btn.getAttribute("data-section"));
-}, { passive: true });
+  openModalFromIcon(btn, sectionId);
+});
 
 if (modalClose) modalClose.addEventListener("click", closeModal);
 if (modalOverlay) modalOverlay.addEventListener("click", closeModal);
@@ -1985,13 +1960,6 @@ document.addEventListener("keydown", e => {
 
 </script>
 
-
-<!-- Modal — populated dynamically by JS from #section-reservoir -->
-<div class="modal-overlay" id="modal-overlay" aria-hidden="true"></div>
-<div class="modal" id="modal" role="dialog" aria-modal="true" aria-hidden="true">
-  <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
-  <div class="modal-body" id="modal-body"></div>
-</div>
 
 </body>
 </html>
