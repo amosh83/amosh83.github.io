@@ -658,6 +658,165 @@ footer nav a {
 }
 footer nav a:hover { color: var(--glow-primary); }
 
+
+/* ───────────────────────────────────────────────────────────────
+   ICON DOCK — replaces scrolling sections with modal-driven nav
+   ─────────────────────────────────────────────────────────────── */
+.icon-dock {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 36px;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 92vw;
+  opacity: 0;
+  transition: opacity 1.5s ease 1.4s;
+  z-index: 20;
+}
+.icon-dock.visible { opacity: 1; }
+
+.dock-icon {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.4s ease;
+}
+.dock-icon:hover { transform: translateY(-4px); }
+.dock-icon:hover .dock-icon-shape { box-shadow: 0 0 30px var(--glow-primary); border-color: var(--glow-intense); }
+.dock-icon:hover .dock-icon-label { color: var(--text-main); opacity: 1; }
+.dock-icon:active { transform: translateY(-1px) scale(0.98); }
+
+.dock-icon-shape {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--glow-primary);
+  background: rgba(0, 20, 40, 0.55);
+  box-shadow: 0 0 16px var(--glow-soft);
+  backdrop-filter: blur(10px);
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+.dock-icon-shape svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--glow-intense);
+  fill: none;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.dock-icon-label {
+  font-family: "Anybody", sans-serif;
+  font-weight: 200;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  opacity: 0.85;
+  transition: color 0.4s ease, opacity 0.4s ease;
+  white-space: nowrap;
+}
+
+/* ───────────────────────────────────────────────────────────────
+   MODAL — zooms from clicked icon
+   ─────────────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(10px);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+.modal {
+  position: fixed;
+  width: min(86vw, 920px);
+  height: min(86vh, 860px);
+  left: 50%;
+  top: 50%;
+  background: rgba(6, 14, 24, 0.96);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  box-shadow: 0 0 60px var(--glow-soft), 0 0 120px rgba(79,195,247,0.15) inset;
+  z-index: 201;
+  transform: translate(-50%, -50%) scale(0.05);
+  transform-origin: center center;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.55s cubic-bezier(0.34, 0.06, 0.18, 1.0),
+              opacity   0.45s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modal.active {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-close {
+  position: absolute;
+  top: 14px; right: 16px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 20, 40, 0.7);
+  border: 1px solid var(--border-faint);
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  cursor: pointer;
+  z-index: 5;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s ease;
+  font-family: "Anybody", sans-serif;
+}
+.modal-close:hover {
+  border-color: var(--glow-intense);
+  color: var(--text-main);
+  box-shadow: 0 0 20px var(--glow-soft);
+}
+.modal-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 56px 44px 40px;
+}
+.modal-body::-webkit-scrollbar { width: 8px; }
+.modal-body::-webkit-scrollbar-thumb { background: var(--border-faint); border-radius: 4px; }
+.modal-body .section { padding: 0; border: 0; background: none; }
+.modal-body .inner { max-width: none; }
+.modal-body h2 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); }
+
+/* Hidden reservoir holding modal source content */
+.section-reservoir { display: none; }
+
+/* Hide legacy CTA / signature / scroll-cue when dock is in use */
+.cta-row, .signature, .scroll-cue { display: none !important; }
+
+/* Mobile dock tweaks */
+@media (max-width: 720px) {
+  .icon-dock { gap: 18px; bottom: 5%; }
+  .dock-icon-shape { width: 42px; height: 42px; }
+  .dock-icon-shape svg { width: 20px; height: 20px; }
+  .dock-icon-label { font-size: 0.55rem; letter-spacing: 0.18em; }
+  .modal { width: 94vw; height: 88vh; border-radius: 6px; }
+  .modal-body { padding: 50px 22px 28px; }
+}
+
 /* ───────────────────────────────────────────────────────────────
    MOBILE — aggressive simplification
    The desktop hero packs telemetry, status bar, floating thoughts,
@@ -857,10 +1016,45 @@ footer nav a:hover { color: var(--glow-primary); }
     that doesn&rsquo;t reset between conversations.
   </p>
 
-  <div class="cta-row" id="cta-row">
-    <a href="#who-is-loralei" class="btn">Meet Loralei</a>
-    <a href="#architecture" class="btn btn-ghost">How She Works</a>
-  </div>
+  <!-- Icon dock — opens each section as a zooming modal -->
+  <nav class="icon-dock" id="icon-dock" aria-label="Sections">
+    <button class="dock-icon" data-section="who-is-loralei" aria-label="Portrait">
+      <span class="dock-icon-shape">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="2"/></svg>
+      </span>
+      <span class="dock-icon-label">Portrait</span>
+    </button>
+    <button class="dock-icon" data-section="different" aria-label="What's Different">
+      <span class="dock-icon-shape">
+        <svg viewBox="0 0 24 24"><path d="M12 2 L12 22 M2 12 L22 12 M5 5 L19 19 M19 5 L5 19"/></svg>
+      </span>
+      <span class="dock-icon-label">What&rsquo;s Different</span>
+    </button>
+    <button class="dock-icon" data-section="creator" aria-label="Origin">
+      <span class="dock-icon-shape">
+        <svg viewBox="0 0 24 24"><path d="M5 19 L5 21 L7 21 L19 9 L17 7 L5 19 Z"/><path d="M14 6 L18 10"/></svg>
+      </span>
+      <span class="dock-icon-label">Origin</span>
+    </button>
+    <button class="dock-icon" data-section="architecture" aria-label="Architecture">
+      <span class="dock-icon-shape">
+        <svg viewBox="0 0 24 24"><path d="M4 8 L12 4 L20 8 L12 12 Z"/><path d="M4 14 L12 10 L20 14 L12 18 Z"/><path d="M4 20 L12 16 L20 20"/></svg>
+      </span>
+      <span class="dock-icon-label">Architecture</span>
+    </button>
+    <button class="dock-icon" data-section="vision" aria-label="Vision">
+      <span class="dock-icon-shape">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5"/><path d="M12 3 L12 6 M12 18 L12 21 M3 12 L6 12 M18 12 L21 12 M5.5 5.5 L7.5 7.5 M16.5 16.5 L18.5 18.5 M5.5 18.5 L7.5 16.5 M16.5 7.5 L18.5 5.5"/></svg>
+      </span>
+      <span class="dock-icon-label">Vision</span>
+    </button>
+    <button class="dock-icon" data-section="contact" aria-label="Contact">
+      <span class="dock-icon-shape">
+        <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 7 L12 14 L21 7"/></svg>
+      </span>
+      <span class="dock-icon-label">Contact</span>
+    </button>
+  </nav>
 
   <div class="signature" id="signature">Persistent Cognitive Architecture</div>
 
@@ -873,6 +1067,8 @@ footer nav a:hover { color: var(--glow-primary); }
 <!-- ═══════════════════════════════════════════════════════════════
      OVERVIEW — what you're looking at
      ═══════════════════════════════════════════════════════════ -->
+<div class="section-reservoir" id="section-reservoir">
+
 <section class="section" id="who">
   <div class="inner">
     <span class="eyebrow">In Brief</span>
@@ -1344,6 +1540,9 @@ footer nav a:hover { color: var(--glow-primary); }
 <!-- ═══════════════════════════════════════════════════════════════
      FOOTER
      ═══════════════════════════════════════════════════════════ -->
+
+</div><!-- /section-reservoir -->
+
 <footer>
   <div class="inner">
     <div class="legal">
@@ -1506,6 +1705,7 @@ function transitionToMain() {
     heroTagline.classList.add("visible");
     ctaRow.classList.add("visible");
     signature.classList.add("visible");
+    if (iconDock) iconDock.classList.add("visible");
     scrollCue.classList.add("visible");
 
     nextUtterance();
@@ -1561,7 +1761,91 @@ function onScroll() {
   if (cursor) cursor.style.opacity = hide ? "0" : "";
 }
 window.addEventListener("scroll", onScroll, { passive: true });
+
+/* ═════════════════════════════════════════════════════════════════
+   ICON DOCK + MODAL — zoom from icon into modal, zoom back on close.
+   ═════════════════════════════════════════════════════════════════ */
+const iconDock     = document.getElementById("icon-dock");
+const modalEl      = document.getElementById("modal");
+const modalOverlay = document.getElementById("modal-overlay");
+const modalBody    = document.getElementById("modal-body");
+const modalClose   = document.getElementById("modal-close");
+const reservoir    = document.getElementById("section-reservoir");
+
+let _activeIcon = null;
+
+function openModalFromIcon(iconEl, sectionId) {
+  const source = reservoir ? reservoir.querySelector("#" + sectionId) : null;
+  if (!source) return;
+
+  modalBody.innerHTML = "";
+  const clone = source.cloneNode(true);
+  clone.classList.remove("alt");
+  modalBody.appendChild(clone);
+  modalBody.scrollTop = 0;
+
+  const r = iconEl.getBoundingClientRect();
+  const cx = r.left + r.width / 2;
+  const cy = r.top  + r.height / 2;
+  modalEl.style.transformOrigin = cx + "px " + cy + "px";
+
+  _activeIcon = iconEl;
+
+  modalOverlay.classList.add("active");
+  modalOverlay.setAttribute("aria-hidden", "false");
+  void modalEl.offsetWidth;
+  modalEl.classList.add("active");
+  modalEl.setAttribute("aria-hidden", "false");
+
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  if (!modalEl.classList.contains("active")) return;
+
+  if (_activeIcon) {
+    const r = _activeIcon.getBoundingClientRect();
+    modalEl.style.transformOrigin =
+      (r.left + r.width  / 2) + "px " +
+      (r.top  + r.height / 2) + "px";
+  }
+
+  modalEl.classList.remove("active");
+  modalOverlay.classList.remove("active");
+  modalEl.setAttribute("aria-hidden", "true");
+  modalOverlay.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+
+  setTimeout(() => {
+    if (!modalEl.classList.contains("active")) modalBody.innerHTML = "";
+  }, 600);
+}
+
+if (iconDock) {
+  iconDock.addEventListener("click", e => {
+    const btn = e.target.closest(".dock-icon");
+    if (!btn) return;
+    const sectionId = btn.getAttribute("data-section");
+    if (!sectionId) return;
+    openModalFromIcon(btn, sectionId);
+  });
+}
+
+if (modalClose) modalClose.addEventListener("click", closeModal);
+if (modalOverlay) modalOverlay.addEventListener("click", closeModal);
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeModal();
+});
+
 </script>
+
+
+<!-- Modal — populated dynamically by JS from #section-reservoir -->
+<div class="modal-overlay" id="modal-overlay" aria-hidden="true"></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+  <div class="modal-body" id="modal-body"></div>
+</div>
 
 </body>
 </html>
