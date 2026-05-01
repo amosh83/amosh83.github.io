@@ -738,7 +738,12 @@ footer nav a:hover { color: var(--glow-primary); }
   box-shadow: 0 0 16px var(--glow-soft);
   backdrop-filter: blur(10px);
   transition: box-shadow 0.4s ease, border-color 0.4s ease;
+  /* iOS Safari fix: prevent the inner svg from receiving the touch
+     event so e.target is always the .dock-icon button. */
+  pointer-events: none;
 }
+.dock-icon-shape svg,
+.dock-icon-label { pointer-events: none; }
 .dock-icon-shape svg {
   width: 28px;
   height: 28px;
@@ -1929,14 +1934,15 @@ function closeModal() {
   }, 600);
 }
 
-iconDocks.forEach(dock => {
-  dock.addEventListener("click", e => {
-    const btn = e.target.closest(".dock-icon");
-    if (!btn) return;
-    const sectionId = btn.getAttribute("data-section");
-    if (!sectionId) return;
-    openModalFromIcon(btn, sectionId);
-  });
+// Document-level delegation: bullet-proof against any per-element
+// listener-attachment timing or iOS Safari closest()-on-SVG quirks.
+document.addEventListener("click", e => {
+  const btn = e.target && e.target.closest && e.target.closest(".dock-icon");
+  if (!btn) return;
+  const sectionId = btn.getAttribute("data-section");
+  if (!sectionId) return;
+  e.preventDefault();
+  openModalFromIcon(btn, sectionId);
 });
 
 if (modalClose) modalClose.addEventListener("click", closeModal);
