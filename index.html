@@ -112,9 +112,16 @@ video { max-width: 90%; max-height: 90%; object-fit: contain; }
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-color: var(--bg-dark);
   opacity: 0;
   transition: opacity 2.5s ease;
 }
+/* On wide desktop monitors the logo's dark navy margins started to
+   feel like wasted space — zoom the bg image in so LORALEI takes
+   more of the viewport. */
+@media (min-width: 1200px) { .logo-frame { background-size: 115%; } }
+@media (min-width: 1600px) { .logo-frame { background-size: 130%; } }
+@media (min-width: 2200px) { .logo-frame { background-size: 150%; } }
 .logo-frame.visible {
   opacity: 1;
   animation: bgDrift 30s ease-in-out infinite;
@@ -2178,6 +2185,17 @@ document.addEventListener("click", e => {
 
 /* Apply on first load (immediate — before anything else paints) */
 applyLang(detectLang());
+
+/* TEMP — viewport diagnostic. Remove once layout sizing is confirmed.
+   Shows the browser's reported innerWidth / innerHeight so we can see
+   if a wide monitor is actually being seen as wide. */
+(function _vpDiag(){
+  const d = document.createElement("div");
+  d.style.cssText = "position:fixed;left:8px;bottom:34px;z-index:9999;font:600 10px/1.2 monospace;color:#7fdcff;background:rgba(0,30,55,0.85);border:1px solid #2cb3ff;border-radius:3px;padding:4px 7px;pointer-events:none";
+  function upd(){ d.textContent = "VP " + window.innerWidth + "×" + window.innerHeight + " · DPR " + (window.devicePixelRatio || 1); }
+  upd(); window.addEventListener("resize", upd);
+  document.body.appendChild(d);
+})();
 
 /* Reveal the picker alongside the rest of the hero UI */
 const _origTransition = window.transitionToMain;
