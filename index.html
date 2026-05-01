@@ -752,9 +752,19 @@ footer nav a:hover { color: var(--glow-primary); }
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  --arch-y: 0px;
+  transform: translateY(var(--arch-y));
   transition: transform 0.4s ease;
 }
-.dock-icon:hover { transform: translateY(-4px); }
+.dock-icon:hover { transform: translateY(calc(var(--arch-y) - 4px)); }
+
+/* Arch curvature — top set arches up (middle peak), bottom set arches
+   down (middle valley) so the icons trace an oval around the LORALEI
+   logo. */
+.icon-dock.top    > .dock-icon:nth-child(1),
+.icon-dock.top    > .dock-icon:nth-child(3) { --arch-y: 24px;  }
+.icon-dock.bottom > .dock-icon:nth-child(1),
+.icon-dock.bottom > .dock-icon:nth-child(3) { --arch-y: -24px; }
 .dock-icon:hover .dock-icon-shape { box-shadow: 0 0 30px var(--glow-primary); border-color: var(--glow-intense); }
 .dock-icon:hover .dock-icon-label { color: var(--text-main); opacity: 1; }
 .dock-icon:active { transform: translateY(-1px) scale(0.98); }
@@ -788,12 +798,18 @@ footer nav a:hover { color: var(--glow-primary); }
 }
 .dock-icon-label {
   font-family: "Anybody", sans-serif;
-  font-weight: 200;
+  font-weight: 300;
   font-size: 0.68rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--text-dim);
-  opacity: 0.85;
+  /* Bright cyan + heavy dark halo so labels stay legible over any part
+     of the artwork (dark navy AND brighter starry strands). */
+  color: #7fdcff;
+  opacity: 1;
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.92),
+    0 0 8px rgba(0, 0, 0, 0.6),
+    0 0 14px rgba(0, 30, 60, 0.55);
   transition: color 0.4s ease, opacity 0.4s ease;
   white-space: nowrap;
 }
@@ -932,6 +948,11 @@ footer .legal {
   }
   .icon-dock.top    { top: calc(100px + env(safe-area-inset-top)); }
   .icon-dock.bottom { bottom: calc(100px + env(safe-area-inset-bottom)); }
+  /* Smaller arch curvature on mobile (icons are smaller) */
+  .icon-dock.top    > .dock-icon:nth-child(1),
+  .icon-dock.top    > .dock-icon:nth-child(3) { --arch-y: 18px;  }
+  .icon-dock.bottom > .dock-icon:nth-child(1),
+  .icon-dock.bottom > .dock-icon:nth-child(3) { --arch-y: -18px; }
   .dock-icon { gap: 6px; }
   .dock-icon-shape { width: 50px; height: 50px; }
   .dock-icon-shape svg { width: 22px; height: 22px; }
