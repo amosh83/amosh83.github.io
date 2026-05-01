@@ -102,8 +102,10 @@ video { max-width: 90%; max-height: 90%; object-fit: contain; }
   padding-bottom: 24vh;   /* leave room at the bottom for the dock */
 }
 .logo-img {
-  max-width: min(78vw, 460px);
-  max-height: 60vh;
+  /* Portrait artwork (562×800). Lead with max-height so it fills vertical
+     space gracefully on tall screens; max-width is the safety cap. */
+  max-height: 62vh;
+  max-width: min(82vw, 360px);
   object-fit: contain;
   opacity: 0;
   transition: opacity 2.5s ease;
@@ -882,15 +884,16 @@ footer .legal {
     line-height: 1.25;
     max-width: 84px;
   }
-  /* Logo positioning on mobile: lift higher, smaller height so icons fit */
+  /* Portrait logo on mobile: keep upper-aligned with breathing room top
+     so the LORALEI text reads. Lead with max-height since it's portrait. */
   .logo-frame {
-    padding-bottom: 32vh;
+    padding-bottom: 30vh;
     align-items: flex-start;
-    padding-top: 14vh;
+    padding-top: 8vh;
   }
   .logo-img {
-    max-width: 70vw;
-    max-height: 42vh;
+    max-height: 50vh;
+    max-width: 75vw;
   }
   .modal { width: 94vw; height: 88vh; border-radius: 6px; }
   .modal-body { padding: 50px 22px 28px; }
