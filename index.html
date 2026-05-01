@@ -90,8 +90,12 @@ html, body {
 #video-container.fade-out { opacity: 0; pointer-events: none; }
 video { max-width: 90%; max-height: 90%; object-fit: contain; }
 
-/* Logo image — inline element, centered and sized via flex.
-   Pushed slightly above center so dock has clear space below. */
+/* Logo display — TWO images:
+     • Desktop (>720px): Logo-desktop.jpg as a full-screen background on
+       .logo-frame (cinematic edge-to-edge)
+     • Mobile (≤720px): Logo.jpg as an inline <img> centered in the frame
+   Both fade in together via .logo-frame.visible (added by JS after
+   the intro video transitions out). */
 .logo-frame {
   position: absolute; inset: 0;
   display: flex;
@@ -99,20 +103,25 @@ video { max-width: 90%; max-height: 90%; object-fit: contain; }
   justify-content: center;
   z-index: 3;
   pointer-events: none;
-  padding-bottom: 24vh;   /* leave room at the bottom for the dock */
-}
-.logo-img {
-  /* Portrait artwork (562×800). Lead with max-height so it fills vertical
-     space gracefully on tall screens; max-width is the safety cap. */
-  max-height: 62vh;
-  max-width: min(82vw, 360px);
-  object-fit: contain;
+  padding-bottom: 24vh;
+  /* Desktop full-bleed background (hidden on mobile via media query) */
+  background-image: url('Logo-desktop.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   opacity: 0;
   transition: opacity 2.5s ease;
 }
-.logo-img.visible {
+.logo-frame.visible {
   opacity: 1;
   animation: bgDrift 30s ease-in-out infinite;
+}
+.logo-img {
+  /* Inline portrait img — used on mobile only */
+  max-height: 62vh;
+  max-width: min(82vw, 360px);
+  object-fit: contain;
+  display: none;
 }
 @keyframes bgDrift { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
 
@@ -884,14 +893,15 @@ footer .legal {
     line-height: 1.25;
     max-width: 84px;
   }
-  /* Portrait logo on mobile: keep upper-aligned with breathing room top
-     so the LORALEI text reads. Lead with max-height since it's portrait. */
+  /* Mobile: hide desktop full-bleed bg, show inline portrait img */
   .logo-frame {
+    background-image: none;
     padding-bottom: 30vh;
     align-items: flex-start;
     padding-top: 8vh;
   }
   .logo-img {
+    display: block;
     max-height: 50vh;
     max-width: 75vw;
   }
@@ -1649,7 +1659,7 @@ footer .legal {
    ═════════════════════════════════════════════════════════════════ */
 const video           = document.getElementById("intro-video");
 const videoContainer  = document.getElementById("video-container");
-const logoImg         = document.getElementById("logo-img");
+const logoFrame       = document.querySelector(".logo-frame");
 const message         = document.getElementById("message");
 const tooltip         = document.getElementById("tooltip");
 const telemetry       = document.getElementById("telemetry");
@@ -1779,7 +1789,7 @@ function transitionToMain() {
   hasTransitioned = true;
 
   videoContainer.classList.add("fade-out");
-  logoImg.classList.add("visible");
+  logoFrame.classList.add("visible");
 
   setTimeout(() => {
     if (telemetry)    telemetry.classList.add("visible");
@@ -1836,7 +1846,7 @@ const heroEl = document.getElementById("hero");
 function onScroll() {
   const past = window.scrollY > (heroEl.offsetHeight * 0.75);
   const hide = past;
-  for (const el of [telemetry, statusBar, innerThought, heroTagline, ctaRow, signature, scrollCue, message, logoImg]) {
+  for (const el of [telemetry, statusBar, innerThought, heroTagline, ctaRow, signature, scrollCue, message, logoFrame]) {
     if (!el) continue;
     el.style.opacity = hide ? "0" : "";
     el.style.pointerEvents = hide ? "none" : "";
