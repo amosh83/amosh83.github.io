@@ -861,20 +861,32 @@ footer nav a:hover { color: var(--glow-primary); }
    ─────────────────────────────────────────────────────────────── */
 .icon-dock {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   gap: 36px;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  flex-wrap: nowrap;            /* one clean row of 3 */
-  max-width: 96vw;
+  flex-wrap: nowrap;
+  max-width: none;
   opacity: 0;
   transition: opacity 1.5s ease 1.4s;
   z-index: 20;
 }
-.icon-dock.top    { top: 21%; }
-.icon-dock.bottom { bottom: 21%; }
+/* All 6 spheres in ONE straight row below the LORALEI logo (same layout
+   as mobile). Top dock sits to the left of viewport center, bottom dock
+   to the right, forming a continuous row of 6. Per-breakpoint sizing
+   below scales gap/icon size for larger monitors. */
+.icon-dock.top {
+  top: auto;
+  bottom: 14%;
+  left: 50%;
+  transform: translateX(calc(-100% - 18px));
+}
+.icon-dock.bottom {
+  top: auto;
+  bottom: 14%;
+  left: 50%;
+  transform: translateX(18px);
+}
 
 /* ───────────────────────────────────────────────────────────────
    Wide-screen scaling — desktop monitors maximized.
@@ -885,33 +897,27 @@ footer nav a:hover { color: var(--glow-primary); }
    ─────────────────────────────────────────────────────────────── */
 @media (min-width: 1200px) {
   .icon-dock { gap: 56px; }
+  .icon-dock.top    { transform: translateX(calc(-100% - 28px)); }
+  .icon-dock.bottom { transform: translateX(28px); }
   .dock-icon-shape { width: 68px; height: 68px; }
   .dock-icon-shape svg { width: 32px; height: 32px; }
   .dock-icon-label { font-size: 0.74rem; letter-spacing: 0.24em; }
-  .icon-dock.top    > .dock-icon:nth-child(1),
-  .icon-dock.top    > .dock-icon:nth-child(3) { --arch-y: 28px;  }
-  .icon-dock.bottom > .dock-icon:nth-child(1),
-  .icon-dock.bottom > .dock-icon:nth-child(3) { --arch-y: -28px; }
 }
 @media (min-width: 1600px) {
   .icon-dock { gap: 84px; }
+  .icon-dock.top    { transform: translateX(calc(-100% - 42px)); }
+  .icon-dock.bottom { transform: translateX(42px); }
   .dock-icon-shape { width: 76px; height: 76px; }
   .dock-icon-shape svg { width: 36px; height: 36px; }
   .dock-icon-label { font-size: 0.78rem; }
-  .icon-dock.top    > .dock-icon:nth-child(1),
-  .icon-dock.top    > .dock-icon:nth-child(3) { --arch-y: 34px;  }
-  .icon-dock.bottom > .dock-icon:nth-child(1),
-  .icon-dock.bottom > .dock-icon:nth-child(3) { --arch-y: -34px; }
 }
 @media (min-width: 2200px) {
   .icon-dock { gap: 120px; }
+  .icon-dock.top    { transform: translateX(calc(-100% - 60px)); }
+  .icon-dock.bottom { transform: translateX(60px); }
   .dock-icon-shape { width: 86px; height: 86px; }
   .dock-icon-shape svg { width: 40px; height: 40px; }
   .dock-icon-label { font-size: 0.82rem; }
-  .icon-dock.top    > .dock-icon:nth-child(1),
-  .icon-dock.top    > .dock-icon:nth-child(3) { --arch-y: 40px;  }
-  .icon-dock.bottom > .dock-icon:nth-child(1),
-  .icon-dock.bottom > .dock-icon:nth-child(3) { --arch-y: -40px; }
 }
 
 /* Telemetry + status scale with viewport too */
@@ -948,13 +954,9 @@ footer nav a:hover { color: var(--glow-primary); }
 }
 .dock-icon:hover { transform: translateY(calc(var(--arch-y) - 4px)); }
 
-/* Arch curvature — top set arches up (middle peak), bottom set arches
-   down (middle valley) so the icons trace an oval around the LORALEI
-   logo. */
-.icon-dock.top    > .dock-icon:nth-child(1),
-.icon-dock.top    > .dock-icon:nth-child(3) { --arch-y: 24px;  }
-.icon-dock.bottom > .dock-icon:nth-child(1),
-.icon-dock.bottom > .dock-icon:nth-child(3) { --arch-y: -24px; }
+/* Arch curvature is flattened on every breakpoint — all 6 spheres now
+   share one straight row below the LORALEI logo. (--arch-y stays at 0
+   so the hover lift in `.dock-icon:hover` still works uniformly.) */
 .dock-icon:hover .dock-icon-shape { box-shadow: 0 0 30px var(--glow-primary); border-color: var(--glow-intense); }
 .dock-icon:hover .dock-icon-label { color: var(--text-main); opacity: 1; }
 .dock-icon:active { transform: translateY(-1px) scale(0.98); }
@@ -1115,8 +1117,9 @@ footer .legal {
   text-overflow: ellipsis;
 }
 
-/* Lift the dock so it doesn't collide with the footer strip */
-.icon-dock { bottom: 11%; }
+/* (Old override that lifted the dock above the footer is no longer
+   needed — both docks now use `bottom: 14%` directly in the base rules
+   above, leaving clear room above the footer strip on every breakpoint.) */
 @media (max-width: 720px) {
   footer {
     padding: 6px 6vw calc(8px + env(safe-area-inset-bottom)) 6vw;
