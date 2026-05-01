@@ -1239,8 +1239,28 @@ footer .legal {
 }
 .hero-summary.visible { opacity: 0.95; }
 @media (max-width: 720px) {
-  .top-nav { display: none; }
+  /* Mobile top nav — visible, compact, allowed to wrap to 2 rows.
+     Stays directly under the language picker / clock band so it
+     doesn't crowd the LORALEI logo. */
+  .top-nav {
+    top: 56px;
+    gap: 4px 6px;
+    font-size: 0.55rem;
+    letter-spacing: 0.16em;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 92vw;
+  }
+  .top-nav-link { padding: 3px 8px; }
+  .top-nav-sep { display: none; }
+  .top-nav-cta {
+    margin-left: 0;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
   .hero-summary { display: none; }
+  /* Tooltip — narrower on mobile so it never overflows the viewport */
+  #tooltip { max-width: min(86vw, 280px); font-size: 0.85rem; padding: 12px 14px; }
 }
 @media (min-width: 1200px) {
   .top-nav { gap: 10px; font-size: 0.74rem; top: 32px; }
@@ -2268,13 +2288,35 @@ function showBioTooltip(ind) {
   const tDesc  = (descKey  && I18N_T[descKey]  && I18N_T[descKey][lang])  || desc;
   t.querySelector(".tooltip-title").textContent = tTitle;
   t.querySelector(".tooltip-body").textContent  = tDesc;
-  // Position right of icon, fall back to left if off-screen, then clamp
+  // Position smartly: right of the sphere on desktop, but on small
+  // screens (or when right-of would overflow) center horizontally and
+  // place above/below the sphere depending on which side has more room.
   const r = ind.getBoundingClientRect();
-  let left = r.right + 16;
-  if (left + 280 > window.innerWidth) left = r.left - 296;
-  if (left < 16) left = 16;
+  // Read tooltip's actual rendered size after we set its content above
+  t.style.left = "0px"; t.style.top = "0px"; t.style.opacity = "0";
+  // Force a layout
+  void t.offsetWidth;
+  const tw = t.offsetWidth || 280;
+  const th = t.offsetHeight || 120;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  let left, top;
+  if (vw >= 720 && r.right + 16 + tw <= vw) {
+    // Desktop: place to the right of the sphere
+    left = r.right + 16;
+    top  = r.top;
+  } else {
+    // Mobile (or right-side won't fit): horizontally center on the
+    // sphere; place tooltip above if more room above, else below
+    left = r.left + r.width / 2 - tw / 2;
+    const roomAbove = r.top, roomBelow = vh - r.bottom;
+    if (roomBelow >= roomAbove) top = r.bottom + 12;
+    else                        top = r.top - th - 12;
+  }
+  // Clamp to viewport
+  left = Math.max(8, Math.min(vw - tw - 8, left));
+  top  = Math.max(8, Math.min(vh - th - 8,  top));
   t.style.left = left + "px";
-  t.style.top  = Math.max(16, Math.min(window.innerHeight - 200, r.top)) + "px";
+  t.style.top  = top + "px";
   t.style.opacity = 1;
   clearTimeout(t.hideTimer);
   t.hideTimer = setTimeout(() => { t.style.opacity = 0; }, 6000);
