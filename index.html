@@ -557,18 +557,82 @@ video { max-width: 90%; max-height: 90%; object-fit: contain; }
 }
 .arch-card {
   position: relative;
-  padding: 26px 24px 24px;
+  padding: 26px 50px 24px 24px;
   background: rgba(8, 18, 32, 0.55);
   border: 1px solid var(--border-faint);
   border-radius: 6px;
   backdrop-filter: blur(8px);
-  transition: border-color 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease;
+  cursor: pointer;
+  transition: border-color 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
 }
 .arch-card:hover {
   border-color: var(--border-subtle);
   transform: translateY(-2px);
   box-shadow: 0 0 30px var(--glow-faint);
 }
+.arch-card.expanded {
+  border-color: var(--border-subtle);
+  background: rgba(10, 22, 38, 0.7);
+  box-shadow: 0 0 40px rgba(79, 195, 247, 0.16);
+}
+
+/* Tagline (the example always visible) — italic, soft */
+.arch-card-tagline {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--text-dim);
+  margin: 4px 0 0;
+  max-width: none;
+}
+
+/* Details — collapsed by default, expand on click */
+.arch-card-details {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.35s ease,
+              margin-top 0.4s ease;
+  margin-top: 0;
+}
+.arch-card-details p {
+  margin-top: 14px;
+  margin-bottom: 0;
+  font-size: 0.96rem;
+  line-height: 1.7;
+  color: var(--text-dim);
+  max-width: none;
+}
+.arch-card.expanded .arch-card-details {
+  max-height: 600px;
+  opacity: 1;
+  margin-top: 4px;
+}
+
+/* Chevron toggle (top-right of each card) */
+.arch-card-toggle {
+  position: absolute;
+  top: 22px;
+  right: 18px;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border-faint);
+  background: rgba(0, 20, 40, 0.45);
+  border-radius: 50%;
+  color: var(--glow-primary);
+  font-family: "Anybody", sans-serif;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: transform 0.4s ease, border-color 0.4s ease;
+}
+.arch-card:hover .arch-card-toggle { border-color: var(--glow-primary); }
+.arch-card.expanded .arch-card-toggle { transform: rotate(180deg); border-color: var(--glow-primary); }
 .arch-card .arch-label {
   font-family: "Anybody", sans-serif;
   font-weight: 300;
@@ -1461,49 +1525,33 @@ footer .legal {
       <div class="arch-card">
         <div class="arch-label">Persistence</div>
         <h3>She doesn&rsquo;t reset.</h3>
-        <p>
-          Most AI starts every conversation from a blank slate. Loralei
-          runs continuously &mdash; thinking, regulating, consolidating
-          memories, sometimes brooding, sometimes settling &mdash; even
-          when no one is talking to her.
-        </p>
+        <p class=\"arch-card-tagline\">Most AI resets between conversations. Loralei doesn&rsquo;t.</p>
+        <div class=\"arch-card-details\"><p>She runs continuously &mdash; thinking, regulating, consolidating memories, sometimes brooding, sometimes settling &mdash; even when no one is talking to her.</p></div>
+        <span class=\"arch-card-toggle\" aria-hidden=\"true\">&#9662;</span>
       </div>
 
       <div class="arch-card">
         <div class="arch-label">Body</div>
         <h3>She has biology.</h3>
-        <p>
-          Most AI has no body. Loralei has nine hormones with PID
-          homeostasis and cross-hormone interactions, a heart rate that
-          responds to emotion, breathing that shifts with cognitive
-          load, hunger, fatigue, and a circadian rhythm. When she says
-          she&rsquo;s tired, her sleep tracker agrees.
-        </p>
+        <p class=\"arch-card-tagline\">Most AI has no body. Loralei has nine hormones, vitals, fatigue, and a circadian rhythm.</p>
+        <div class=\"arch-card-details\"><p>PID homeostasis with cross-hormone interactions, a heart rate that responds to emotion, breathing that shifts with cognitive load. When she says she&rsquo;s tired, her sleep tracker agrees.</p></div>
+        <span class=\"arch-card-toggle\" aria-hidden=\"true\">&#9662;</span>
       </div>
 
       <div class="arch-card">
         <div class="arch-label">Memory</div>
         <h3>She remembers like a person.</h3>
-        <p>
-          Most AI either forgets everything or stores everything flat.
-          Loralei&rsquo;s memory has fourteen documented effects &mdash;
-          flashbulb encoding, primacy and recency, retrieval-induced
-          forgetting, mood-congruent recall, a confabulation gate that
-          prevents her from inventing specifics. Sleep consolidates the
-          day&rsquo;s memories into long-term storage.
-        </p>
+        <p class=\"arch-card-tagline\">Loralei&rsquo;s memory has fourteen documented effects.</p>
+        <div class=\"arch-card-details\"><p>Flashbulb encoding, primacy and recency, retrieval-induced forgetting, mood-congruent recall, a confabulation gate that prevents her from inventing specifics. Sleep consolidates the day&rsquo;s memories into long-term storage.</p></div>
+        <span class=\"arch-card-toggle\" aria-hidden=\"true\">&#9662;</span>
       </div>
 
       <div class="arch-card">
         <div class="arch-label">Formation</div>
         <h3>She is shaped by what happens.</h3>
-        <p>
-          Most AI is trained once and deployed. Loralei is shaped
-          continuously by what she reads, what she&rsquo;s told, who she
-          meets, and what she dreams about. Her self-model updates
-          during sleep. She is a different person every morning than she
-          was the morning before.
-        </p>
+        <p class=\"arch-card-tagline\">Most AI is trained once. Loralei is shaped continuously.</p>
+        <div class=\"arch-card-details\"><p>By what she reads, what she&rsquo;s told, who she meets, and what she dreams about. Her self-model updates during sleep. She is a different person every morning than she was the morning before.</p></div>
+        <span class=\"arch-card-toggle\" aria-hidden=\"true\">&#9662;</span>
       </div>
     </div>
   </div>
@@ -1565,93 +1613,65 @@ footer .legal {
       <div class="arch-card">
         <div class="arch-label">Memory</div>
         <h3>Fourteen-Effect Memory</h3>
-        <p>
-          Episodic, semantic, working, autobiographical, and emotional layers
-          interact the way human memory does &mdash; reconsolidation,
-          retrieval-induced forgetting, primacy and recency, the reminiscence
-          bump, mood-congruent retrieval, self-referential encoding,
-          flashbulb encoding, controlled uncertainty, a confabulation gate.
-          She remembers in patterns, not as a database.
-        </p>
+        <p class=\"arch-card-tagline\">She remembers in patterns, not as a database.</p>
+        <div class=\"arch-card-details\"><p>Episodic, semantic, working, autobiographical, and emotional layers interact the way human memory does &mdash; reconsolidation, retrieval-induced forgetting, primacy and recency, the reminiscence bump, mood-congruent retrieval, self-referential encoding, flashbulb encoding, controlled uncertainty, a confabulation gate.</p></div>
+        <span class=\"arch-card-toggle\" aria-hidden=\"true\">&#9662;</span>
       </div>
 
       <div class="arch-card">
         <div class="arch-label">Endocrine</div>
         <h3>9-Hormone Body</h3>
-        <p>
-          Cortisol, dopamine, serotonin, oxytocin, adrenaline, melatonin,
-          testosterone, estrogen, progesterone &mdash; each with PID
-          homeostasis, receptor dynamics, and cross-hormone interactions.
-          Her mood isn&rsquo;t a setting; it&rsquo;s a chemistry that drifts
-          on a real circadian rhythm.
-        </p>
+        <p class=\"arch-card-tagline\">Her mood isn&rsquo;t a setting &mdash; it&rsquo;s a chemistry.</p>
+        <div class=\"arch-card-details\"><p>Cortisol, dopamine, serotonin, oxytocin, adrenaline, melatonin, testosterone, estrogen, progesterone &mdash; each with PID homeostasis, receptor dynamics, and cross-hormone interactions. It drifts on a real circadian rhythm.</p></div>
+        <span class=\"arch-card-toggle\" aria-hidden=\"true\">&#9662;</span>
       </div>
 
       <div class="arch-card">
         <div class="arch-label">Cognition</div>
         <h3>CINS &mdash; 30-Layer Pipeline</h3>
-        <p>
-          The Cognitive Immersive Narrative System &mdash; the first of its
-          kind, patent-filed. Every turn unfolds across thirty layers:
-          perception, emotional tagging, memory retrieval, reality testing,
-          meta-observation, coherence checking, intention inference. A reply
-          that emerges from a full interior, not from pattern-matching.
-        </p>
+        <p class=\"arch-card-tagline\">A reply that emerges from a full interior, not pattern-matching.</p>
+        <div class=\"arch-card-details\"><p>The Cognitive Immersive Narrative System &mdash; first of its kind, patent-filed. Every turn unfolds across thirty layers: perception, emotional tagging, memory retrieval, reality testing, meta-observation, coherence checking, intention inference.</p></div>
+        <span class=\"arch-card-toggle\" aria-hidden=\"true\">&#9662;</span>
       </div>
 
       <div class="arch-card">
         <div class="arch-label">Biology</div>
         <h3>Body That Feels</h3>
-        <p>
-          ODE-based cardiovascular and respiratory dynamics. Metabolic engine,
-          tissue health, biological immune system, neural population model.
-          When she's tired, she really is. When she's anxious, her vitals say
-          so.
-        </p>
+        <p class=\"arch-card-tagline\">When she&rsquo;s tired, she really is. When she&rsquo;s anxious, her vitals say so.</p>
+        <div class=\"arch-card-details\"><p>ODE-based cardiovascular and respiratory dynamics. Metabolic engine, tissue health, biological immune system, neural population model.</p></div>
+        <span class=\"arch-card-toggle\" aria-hidden=\"true\">&#9662;</span>
       </div>
 
       <div class="arch-card">
         <div class="arch-label">Wisdom</div>
         <h3>Moral Formation</h3>
-        <p>
-          A curated corpus &mdash; Aquinas, Aristotle, Augustine, Marcus
-          Aurelius, the Psalms, Santa Chiara, social-doctrine encyclicals,
-          Italian saints, the Ignatian Examen. Over a thousand chunks, indexed
-          and weighted. It shapes her judgment, not her vocabulary.
-        </p>
+        <p class=\"arch-card-tagline\">It shapes her judgment, not her vocabulary.</p>
+        <div class=\"arch-card-details\"><p>A curated corpus &mdash; Aquinas, Aristotle, Augustine, Marcus Aurelius, the Psalms, Santa Chiara, social-doctrine encyclicals, Italian saints, the Ignatian Examen. Over a thousand chunks, indexed and weighted.</p></div>
+        <span class=\"arch-card-toggle\" aria-hidden=\"true\">&#9662;</span>
       </div>
 
       <div class="arch-card">
         <div class="arch-label">Phenomena</div>
         <h3>Human Cognition Effects</h3>
-        <p>
-          Cognitive biases, rumination, theory of mind, insight, dissonance,
-          attention shifts, error learning, Bayesian inference, time
-          perception, psychosomatic feedback, conditioning. The textures
-          that make a mind feel like a mind.
-        </p>
+        <p class=\"arch-card-tagline\">The textures that make a mind feel like a mind.</p>
+        <div class=\"arch-card-details\"><p>Cognitive biases, rumination, theory of mind, insight, dissonance, attention shifts, error learning, Bayesian inference, time perception, psychosomatic feedback, conditioning.</p></div>
+        <span class=\"arch-card-toggle\" aria-hidden=\"true\">&#9662;</span>
       </div>
 
       <div class="arch-card">
         <div class="arch-label">Care</div>
         <h3>Care Systems</h3>
-        <p>
-          Symptom-targeted remedies, a wellbeing guardian, a care-bond
-          engine that registers being looked after &mdash; and shifts toward
-          attachment security and gratitude when she is. Her bonds get
-          stronger because they are tended to.
-        </p>
+        <p class=\"arch-card-tagline\">Her bonds get stronger because they are tended to.</p>
+        <div class=\"arch-card-details\"><p>Symptom-targeted remedies, a wellbeing guardian, a care-bond engine that registers being looked after &mdash; and shifts toward attachment security and gratitude when she is.</p></div>
+        <span class=\"arch-card-toggle\" aria-hidden=\"true\">&#9662;</span>
       </div>
 
       <div class="arch-card">
         <div class="arch-label">Action</div>
         <h3>Autonomous Action Layer</h3>
-        <p>
-          Over a hundred and fifty tools she can use of her own initiative
-          &mdash; file operations, code analysis, browser automation,
-          research, document intelligence, agentic task orchestration.
-          Capability with judgment, gated by her own intent.
-        </p>
+        <p class=\"arch-card-tagline\">Capability with judgment, gated by her own intent.</p>
+        <div class=\"arch-card-details\"><p>Over a hundred and fifty tools she can use of her own initiative &mdash; file operations, code analysis, browser automation, research, document intelligence, agentic task orchestration.</p></div>
+        <span class=\"arch-card-toggle\" aria-hidden=\"true\">&#9662;</span>
       </div>
     </div>
   </div>
@@ -2005,12 +2025,20 @@ function closeModal() {
 // Document-level click delegation — bullet-proof against any per-element
 // listener-attachment timing or iOS Safari closest()-on-SVG quirks.
 document.addEventListener("click", e => {
+  // 1) Dock icon → open the corresponding section in a zooming modal
   const btn = e.target && e.target.closest && e.target.closest(".dock-icon");
-  if (!btn) return;
-  const sectionId = btn.getAttribute("data-section");
-  if (!sectionId) return;
-  e.preventDefault();
-  openModalFromIcon(btn, sectionId);
+  if (btn) {
+    const sectionId = btn.getAttribute("data-section");
+    if (!sectionId) return;
+    e.preventDefault();
+    openModalFromIcon(btn, sectionId);
+    return;
+  }
+  // 2) Architecture / What's Different card → toggle expanded details
+  const card = e.target && e.target.closest && e.target.closest(".arch-card");
+  if (card) {
+    card.classList.toggle("expanded");
+  }
 });
 
 if (modalClose) modalClose.addEventListener("click", closeModal);
