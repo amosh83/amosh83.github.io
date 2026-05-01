@@ -2196,9 +2196,24 @@ function transitionToMain() {
    visual content, ~30% shorter duration. Set BEFORE play() so it takes
    effect on first frame. */
 video.playbackRate = 1.4;
-video.addEventListener("ended", transitionToMain);
-video.addEventListener("error", transitionToMain);
-setTimeout(() => { if (!hasTransitioned && video.paused) transitionToMain(); }, 3000);
+
+/* Robust transition gating:
+   • If the video reaches its end naturally → transition (the desired path)
+   • If the video errors (decode failure, 404, network drop) → transition
+   • If `play()`'s promise rejects (autoplay blocked) → transition
+   • If 15 seconds pass and the video still hasn't started playing
+     (cold cache on a slow connection, or browser silently refused
+     autoplay without rejecting the promise) → transition.
+   The earlier 3-second blanket timer was firing on slower phones where
+   the video file hadn't finished loading yet and skipping the intro
+   for them entirely. Now we only bail when there's real evidence the
+   video isn't going to play. */
+let _coldStartTimer = setTimeout(() => {
+  if (!hasTransitioned && video.readyState < 2) transitionToMain();
+}, 15000);
+video.addEventListener("playing", () => { clearTimeout(_coldStartTimer); });
+video.addEventListener("ended",   transitionToMain);
+video.addEventListener("error",   transitionToMain);
 video.play().catch(transitionToMain);
 
 /* Bio-indicator tooltips are handled by the document-level click delegation
