@@ -36,6 +36,7 @@ html, body {
   /* Single-screen experience — no page scroll. The modal scrolls internally. */
   overflow: hidden;
   height: 100%;
+  height: 100dvh;
   scroll-behavior: smooth;
 }
 
@@ -73,7 +74,10 @@ html, body {
    ─────────────────────────────────────────────────────────────── */
 .hero {
   position: relative;
+  /* Use dynamic viewport height so iOS Safari's collapsing URL bar
+     doesn't push our bottom-anchored elements behind the chrome. */
   height: 100vh;
+  height: 100dvh;
   width: 100%;
   overflow: hidden;
   cursor: none;
@@ -866,44 +870,52 @@ footer .legal {
   text-overflow: ellipsis;
 }
 
-/* Lift the dock so it doesn't collide with the new footer strip */
+/* Lift the dock so it doesn't collide with the footer strip */
 .icon-dock { bottom: 11%; }
 @media (max-width: 720px) {
-  .icon-dock { bottom: 12%; }
-  footer .legal { font-size: 0.5rem; letter-spacing: 0.14em; }
+  footer {
+    padding: 6px 6vw calc(8px + env(safe-area-inset-bottom)) 6vw;
+  }
+  footer .legal {
+    font-size: 0.45rem;
+    letter-spacing: 0.12em;
+  }
 }
 
 /* Mobile dock tweaks — 3-column grid (2 rows × 3 icons) */
 @media (max-width: 720px) {
   .icon-dock {
     display: grid;
-    grid-template-columns: repeat(3, 84px);
-    gap: 18px 12px;
-    bottom: 11%;
+    grid-template-columns: repeat(3, 78px);
+    gap: 14px 10px;
+    /* Anchor with fixed-px clearance from the footer so iOS Safari's
+       collapsing URL bar doesn't squeeze the layout. */
+    bottom: calc(48px + env(safe-area-inset-bottom));
     max-width: none;
   }
-  .dock-icon { gap: 6px; }
-  .dock-icon-shape { width: 44px; height: 44px; }
-  .dock-icon-shape svg { width: 20px; height: 20px; }
+  .dock-icon { gap: 5px; }
+  .dock-icon-shape { width: 40px; height: 40px; }
+  .dock-icon-shape svg { width: 18px; height: 18px; }
   .dock-icon-label {
-    font-size: 0.5rem;
-    letter-spacing: 0.14em;
-    white-space: normal;       /* allow 2-line labels in narrow cells */
+    font-size: 0.48rem;
+    letter-spacing: 0.12em;
+    white-space: normal;
     text-align: center;
-    line-height: 1.25;
-    max-width: 84px;
+    line-height: 1.2;
+    max-width: 78px;
   }
-  /* Mobile: hide desktop full-bleed bg, show inline portrait img */
+  /* Mobile: hide desktop full-bleed bg, show inline portrait img.
+     Constrain logo so dock + footer have guaranteed clearance. */
   .logo-frame {
     background-image: none;
-    padding-bottom: 30vh;
+    padding-bottom: 38vh;
     align-items: flex-start;
-    padding-top: 8vh;
+    padding-top: 5vh;
   }
   .logo-img {
     display: block;
-    max-height: 50vh;
-    max-width: 75vw;
+    max-height: 44vh;
+    max-width: 70vw;
   }
   .modal { width: 94vw; height: 88vh; border-radius: 6px; }
   .modal-body { padding: 50px 22px 28px; }
