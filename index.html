@@ -33,7 +33,9 @@ html, body {
   background: var(--bg-dark);
   color: var(--text-primary);
   font-family: "Cormorant Garamond", serif;
-  overflow-x: hidden;
+  /* Single-screen experience — no page scroll. The modal scrolls internally. */
+  overflow: hidden;
+  height: 100%;
   scroll-behavior: smooth;
 }
 
@@ -91,7 +93,7 @@ video { max-width: 90%; max-height: 90%; object-fit: contain; }
 #logo-background {
   position: absolute; inset: 0;
   background-image: url('Logo.jpg');
-  background-size: cover; background-position: center; background-repeat: no-repeat;
+  background-size: contain; background-position: center; background-repeat: no-repeat;
   opacity: 0;
   transition: opacity 2.5s ease;
   z-index: 3;
@@ -804,8 +806,44 @@ footer nav a:hover { color: var(--glow-primary); }
 /* Hidden reservoir holding modal source content */
 .section-reservoir { display: none; }
 
-/* Hide legacy CTA / signature / scroll-cue when dock is in use */
-.cta-row, .signature, .scroll-cue { display: none !important; }
+/* Hide hero elements that competed for the logo center now that the
+   dock is the navigation. The tagline + typewriter message both sat
+   over the logo and obscured the name. */
+.cta-row, .signature, .scroll-cue,
+.hero-tagline, #message { display: none !important; }
+
+/* Compact, fixed-bottom legal strip — replaces the long scrolling footer */
+footer {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  padding: 10px 6vw 12px;
+  background: linear-gradient(to top, rgba(0,0,0,0.78), transparent);
+  border-top: 0;
+  z-index: 12;
+}
+footer .inner {
+  max-width: none;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+footer nav { display: none; }
+footer .legal {
+  font-size: 0.55rem;
+  letter-spacing: 0.18em;
+  line-height: 1.5;
+  color: var(--text-faint);
+}
+
+/* Lift the dock so it doesn't collide with the new footer strip */
+.icon-dock { bottom: 11%; }
+@media (max-width: 720px) {
+  .icon-dock { bottom: 12%; }
+  footer .legal { font-size: 0.5rem; letter-spacing: 0.14em; }
+}
 
 /* Mobile dock tweaks */
 @media (max-width: 720px) {
