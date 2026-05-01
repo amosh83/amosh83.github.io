@@ -904,18 +904,17 @@ footer .legal {
     line-height: 1.2;
     max-width: 78px;
   }
-  /* Mobile: hide desktop full-bleed bg, show inline portrait img.
-     Constrain logo so dock + footer have guaranteed clearance. */
+  /* Mobile: full-bleed portrait Logo.jpg as background (cover). Hide
+     the inline img so the bg image is the only logo visible. */
   .logo-frame {
-    background-image: none;
-    padding-bottom: 38vh;
-    align-items: flex-start;
-    padding-top: 5vh;
+    background-image: url('Logo.jpg');
+    background-size: cover;
+    background-position: center;
+    padding-bottom: 0;
+    padding-top: 0;
   }
   .logo-img {
-    display: block;
-    max-height: 44vh;
-    max-width: 70vw;
+    display: none;
   }
   .modal { width: 94vw; height: 88vh; border-radius: 6px; }
   .modal-body { padding: 50px 22px 28px; }
