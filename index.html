@@ -2178,29 +2178,9 @@ video.addEventListener("error", transitionToMain);
 setTimeout(() => { if (!hasTransitioned && video.paused) transitionToMain(); }, 3000);
 video.play().catch(transitionToMain);
 
-/* Tooltips for bio indicators */
-document.querySelectorAll(".bio-indicator").forEach(indicator => {
-  indicator.addEventListener("click", e => {
-    e.stopPropagation();
-    const title = indicator.dataset.title;
-    const desc  = indicator.dataset.desc;
-
-    tooltip.querySelector(".tooltip-title").textContent = title;
-    tooltip.querySelector(".tooltip-body").textContent  = desc;
-
-    const rect = indicator.getBoundingClientRect();
-    tooltip.style.left = (rect.right + 16) + "px";
-    tooltip.style.top  = rect.top + "px";
-    tooltip.style.opacity = 1;
-
-    clearTimeout(tooltip.hideTimer);
-    tooltip.hideTimer = setTimeout(() => { tooltip.style.opacity = 0; }, 5000);
-  });
-});
-
-document.addEventListener("click", e => {
-  if (!e.target.closest(".bio-indicator")) tooltip.style.opacity = 0;
-});
+/* Bio-indicator tooltips are handled by the document-level click delegation
+   below (see `showBioTooltip`), which positions the tooltip responsively
+   for both desktop (right of sphere) and mobile (centered, above/below). */
 
 /* Interaction button removed for now — will be wired in a later phase. */
 
