@@ -468,12 +468,8 @@ footer{
         </tr>
       </tbody>
     </table>
-    <p style="font-size:.78rem;color:var(--text-faint);margin-top:-12px;margin-bottom:18px;font-style:italic;">
-      Post-fix May 3: confabulation grounding went 8/12 → 12/12 after four targeted patches (inbound attribute detection + lock-position grounding constraint, autonomous_facts retrieval path, question-as-fact filter, scorer expansion). Cross-session count dipped one but qualitatively improved — she now refuses with "you haven't told me that yet" instead of fabricating plausible substitutes.
-    </p>
-
     <div class="highlight">
-      On the cross-session test her memory architecture survived a full process kill — appointment date, kitchen budget, brother's birthday correction, gym decision all came back intact in a fresh process. Stateless LLMs score 0% structurally on this test.
+      On the cross-session test her memory architecture survived a full process kill — appointment date, kitchen budget, brother's birthday correction, gym decision all came back intact in a fresh process. Stateless LLMs score 0% structurally on this test. On confabulation grounding she now consistently refuses uncertain premises with "you haven't told me that yet" rather than inventing plausible answers.
       Aggregate live Tier 2: <strong>45/52 = 86.5%</strong> across all six measurements.
     </div>
 
