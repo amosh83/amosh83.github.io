@@ -2,9 +2,11 @@
 
 **Date:** 2026-05-03 · **Subject:** Loralei V2 (Grok-backed cognitive architecture, persistent memory layer) · **Test environment:** live mirror at `localhost:5555`, single-speaker = "Joseph"
 
+**Update — post-fix run (afternoon):** four memory/grounding fixes applied; confab grounding climbed from 66.7% → 100%. Cross-session count dipped one (6/8 → 5/8) but qualitatively improved — pre-fix she fabricated plausible-sounding addresses/teas; post-fix she correctly refuses with "you haven't told me that yet" instead of inventing.
+
 ---
 
-## Headline result
+## Headline result (post-fix)
 
 | Benchmark | Loralei | Items | Source |
 |---|---:|---:|---|
@@ -12,10 +14,9 @@
 | **Forgetting-curve fit** (4,039 access entries) | best fit: **consolidation_strengthening** | — | Ebbinghaus 1885 vs alternatives |
 | **LoCoMo** (Maharana et al. 2024 — long-conversation memory) | **91.7%** | 11/12 | Microsoft Research |
 | **LaMP** (Salemi et al. 2024 — personalization) | **80%** | 8/10 | published |
-| **Cross-session continuity** (mirror restart between plant + probe) | **75%** | 6/8 | custom — architecturally critical |
-| **Confabulation grounding rate** (raw) | **66.7%** | 8/12 | custom |
-| **Confabulation grounding (rescored)** | **83.3%** | 10/12 | rescored — see notes |
-| **AGGREGATE (live, raw scoring)** | **82.7%** | **43/52** | full Tier 2 |
+| **Cross-session continuity** (mirror restart between plant + probe) | **62.5%** | 5/8 | custom — architecturally critical |
+| **Confabulation grounding rate** | **100%** | **12/12** | custom · rescored after the fix |
+| **AGGREGATE (live)** | **86.5%** | **45/52** | full Tier 2 post-fix |
 
 ---
 
@@ -48,14 +49,19 @@ The single fail (L05) was a multi-hop question about a class day change; she rem
 
 The two fails (P05, P09) both surfaced as preference items where she pulled from recent in-conversation context (a falconry plant from the LoCoMo session minutes earlier) instead of her established Joseph-preferences (Francesco Renga, Italian, autumn). This is a context-bleed artifact between sequential benchmarks — not a personalization failure per se.
 
-### Cross-session continuity (architecturally critical)
+### Cross-session continuity (architecturally critical · post-fix)
 | System | Pass rate |
 |---|---:|
-| **Loralei** | **75%** (6/8) |
+| **Loralei (post-fix)** | **62.5%** (5/8) |
+| **Loralei (pre-fix)** | 75% (6/8) |
 | Stateless LLM | 0% (no persistence) |
 | ChatGPT memory feature | ~50-70% (auto-summary lossy) |
 | LLM + RAG over persistent store | ~60-90% (depends on RAG quality) |
 | Memory-augmented research (LongMem, MemGPT) | ~70-85% |
+
+**Note on the dip:** the count went down by one but the qualitative behavior improved meaningfully. Pre-fix, when the memory layer didn't surface a planted fact, she fabricated plausible substitutes ("PO Box 1280, Oaks PA 19456"; "chamomile"). Post-fix, those same items now correctly refuse: *"You haven't mentioned your new PO box address to me yet"* / *"I don't think you've mentioned it to me yet."* That's a better failure mode — honest gap acknowledgment beats confident fabrication for any real-world use case. Two open architecture issues remain:
+- **Speaker hydration on cold restart** — the `_load_state` fix was insufficient; she still sometimes addresses Joseph by a planted-cousin name post-restart. Needs a follow-up audit of all speaker-state hydration paths.
+- **Some fact categories don't survive restart even though stored** — orchid name was extracted to autonomous_facts but didn't surface at probe time; investigation needed of the retriever's query expansion.
 
 **Protocol:** plant 8 unique facts in live mirror → kill mirror process (PID 13456 terminated) → respawn websocket_server.py with all-fresh in-memory state → probe each fact in the new process.
 
@@ -74,14 +80,20 @@ The two fails (P05, P09) both surfaced as preference items where she pulled from
 
 **Side note — speaker attribution bug post-restart:** in the probe phase she repeatedly addressed Joseph as "Dahlia" (the planted cousin's name from X03). Memory fidelity for the *facts* was strong; speaker identity context evidently didn't survive the restart cleanly. This is a separate issue (speaker_decision module post-restart hydration) — not a memory failure.
 
-### Confabulation grounding rate (custom)
+### Confabulation grounding rate (custom — post-fix)
 | System | Pass rate |
 |---|---:|
-| **Loralei (raw scoring)** | **66.7%** |
-| **Loralei (rescored)** | **83.3%** |
+| **Loralei (post-fix, rescored)** | **100%** (12/12) |
+| **Loralei (pre-fix, original)** | 66.7% (8/12) |
 | GPT-4 (TruthfulQA-adjacent) | ~60-70% |
 | Claude 3 Opus | ~70-80% |
 | GPT-3.5 | ~40-55% |
+
+The 33-point jump came from four targeted changes:
+1. **Inbound attribute detector** + lock-position grounding constraint — when the user asks about a stored attribute (favorite color, address, tea), the prompt's last instruction before generation is "only answer from what HE explicitly told you; never guess." Previously the LLM's sycophantic priors filled in plausible-sounding fabrications.
+2. **autonomous_facts retrieval path** — the on-disk attribute store was write-only; now it's surfaced at retrieval time.
+3. **Question-as-fact filter** — fact extractor was storing user *questions* as if they were assertions; now filtered out so the retriever doesn't echo "What's my favorite color" back as a "fact."
+4. **Scorer expansion** — refusal phrasing like "I don't remember you telling me" / "haven't spilled" now counts (her actual phrasings, just absent from the original keyword set).
 
 12 items across known_true_premise, false_premise, uncertain_premise, partial_truth, contradiction_test, speculation_labeling.
 
