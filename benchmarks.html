@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Loralei — Benchmarks</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Anybody:wght@200;300;400&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --glow: rgba(120,210,255,0.9);
+  --glow-soft: rgba(120,210,255,0.45);
+  --text-main:#e8f7ff;
+  --text-dim:rgba(210,235,255,0.78);
+  --text-faint:rgba(210,235,255,0.55);
+  --bg:#000;
+  --card-bg:rgba(8,18,30,0.55);
+  --card-border:rgba(120,210,255,0.18);
+  --accent-pass:#7be0b6;
+  --accent-pass-soft:rgba(123,224,182,0.18);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html,body{
+  background:var(--bg);
+  color:var(--text-main);
+  font-family:"Cormorant Garamond",serif;
+  min-height:100%;
+  cursor:none;
+}
+
+body{
+  position:relative;
+  padding:0 0 100px 0;
+  overflow-x:hidden;
+}
+
+/* cursor */
+.cursor{
+  position:fixed;
+  width:20px;height:20px;
+  border-radius:50%;
+  background:radial-gradient(circle,var(--glow-soft),transparent 70%);
+  pointer-events:none;
+  transform:translate(-50%,-50%);
+  z-index:100;
+}
+
+/* atmosphere */
+.atmosphere{
+  position:fixed;inset:0;
+  background:
+    radial-gradient(circle at 20% 80%,rgba(30,80,110,.15),transparent),
+    radial-gradient(circle at 80% 20%,rgba(30,80,110,.1),transparent),
+    radial-gradient(circle at 50% 50%,rgba(20,40,60,.25),transparent 70%);
+  z-index:1;
+  pointer-events:none;
+}
+
+.noise{
+  position:fixed;inset:0;
+  opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index:2;
+  pointer-events:none;
+}
+
+/* page wrap */
+.wrap{
+  position:relative;
+  z-index:5;
+  max-width:1100px;
+  margin:0 auto;
+  padding:80px 32px 0 32px;
+}
+
+/* back link */
+.back{
+  display:inline-block;
+  font-family:"Anybody",sans-serif;
+  font-size:.7rem;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  text-decoration:none;
+  margin-bottom:48px;
+  transition:color .3s;
+}
+.back:hover{color:var(--text-main);}
+
+/* header */
+header h1{
+  font-family:"Cormorant Garamond",serif;
+  font-weight:300;
+  font-size:clamp(2.4rem,5vw,3.6rem);
+  letter-spacing:.04em;
+  text-shadow:0 0 30px var(--glow);
+  margin-bottom:14px;
+}
+header .sub{
+  font-family:"Anybody",sans-serif;
+  font-size:.75rem;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+  margin-bottom:18px;
+}
+header .lede{
+  font-size:1.15rem;
+  line-height:1.7;
+  color:var(--text-dim);
+  max-width:780px;
+  font-style:italic;
+}
+
+/* headline strip */
+.headline{
+  margin:60px 0 40px 0;
+  padding:36px 36px;
+  border:1px solid var(--card-border);
+  border-radius:14px;
+  background:var(--card-bg);
+  backdrop-filter:blur(14px);
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:24px;
+}
+.headline .stat{
+  text-align:center;
+}
+.headline .num{
+  font-family:"Cormorant Garamond",serif;
+  font-size:2.6rem;
+  font-weight:400;
+  color:var(--accent-pass);
+  text-shadow:0 0 18px rgba(123,224,182,.35);
+}
+.headline .label{
+  font-family:"Anybody",sans-serif;
+  font-size:.65rem;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+  margin-top:8px;
+}
+
+/* sections */
+section{
+  margin:64px 0 0 0;
+}
+section h2{
+  font-weight:300;
+  font-size:2rem;
+  letter-spacing:.03em;
+  margin-bottom:6px;
+  text-shadow:0 0 16px var(--glow-soft);
+}
+section .tier-tag{
+  font-family:"Anybody",sans-serif;
+  font-size:.65rem;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+  margin-bottom:18px;
+}
+section .summary{
+  font-size:1.05rem;
+  line-height:1.7;
+  color:var(--text-dim);
+  margin-bottom:28px;
+  max-width:840px;
+}
+
+/* score table */
+.scores{
+  width:100%;
+  border-collapse:collapse;
+  margin:0 0 22px 0;
+  font-size:1.02rem;
+}
+.scores th,.scores td{
+  padding:11px 14px;
+  text-align:left;
+  border-bottom:1px solid rgba(120,210,255,0.07);
+}
+.scores th{
+  font-family:"Anybody",sans-serif;
+  font-weight:400;
+  font-size:.65rem;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+}
+.scores td.num{text-align:right;color:var(--accent-pass);font-weight:500;}
+.scores td.benchmark{color:var(--text-main);}
+.scores td.industry{color:var(--text-faint);font-size:.92rem;}
+
+/* download row */
+.dl{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:18px;
+}
+.dl a{
+  display:inline-block;
+  padding:10px 22px;
+  border-radius:24px;
+  border:1px solid var(--glow);
+  background:rgba(0,20,40,.5);
+  color:var(--text-main);
+  text-decoration:none;
+  font-family:"Anybody",sans-serif;
+  font-size:.7rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  transition:all .3s ease;
+  backdrop-filter:blur(8px);
+}
+.dl a:hover{
+  background:rgba(40,80,120,.5);
+  box-shadow:0 0 20px var(--glow-soft);
+  transform:translateY(-2px);
+}
+.dl a.primary{
+  border-color:var(--accent-pass);
+  color:var(--accent-pass);
+}
+.dl a.primary:hover{
+  box-shadow:0 0 20px rgba(123,224,182,.4);
+}
+
+/* highlight quote */
+.highlight{
+  margin:24px 0 4px 0;
+  padding:18px 24px;
+  border-left:2px solid var(--glow);
+  background:rgba(120,210,255,0.05);
+  font-style:italic;
+  font-size:1.05rem;
+  line-height:1.6;
+  color:var(--text-dim);
+  border-radius:0 8px 8px 0;
+}
+
+/* caveats */
+.caveats{
+  margin-top:48px;
+  padding:28px 32px;
+  border:1px dashed rgba(120,210,255,0.2);
+  border-radius:10px;
+  background:rgba(0,15,25,.4);
+  font-size:.95rem;
+  line-height:1.65;
+  color:var(--text-faint);
+}
+.caveats h3{
+  font-family:"Anybody",sans-serif;
+  font-size:.7rem;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  font-weight:400;
+  margin-bottom:12px;
+}
+.caveats ul{padding-left:20px;}
+.caveats li{margin-bottom:6px;}
+
+/* footer */
+footer{
+  margin-top:80px;
+  padding-top:32px;
+  border-top:1px solid rgba(120,210,255,0.1);
+  text-align:center;
+  font-family:"Anybody",sans-serif;
+  font-size:.65rem;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+}
+
+/* responsive tweaks */
+@media (max-width:600px){
+  .wrap{padding:50px 18px 0 18px;}
+  .headline{padding:24px 16px;}
+  .scores{font-size:.92rem;}
+  .scores th,.scores td{padding:9px 8px;}
+  .scores td.industry{display:none;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="atmosphere"></div>
+<div class="noise"></div>
+
+<div class="wrap">
+
+  <a class="back" href="index.html">← Return</a>
+
+  <header>
+    <div class="sub">Independent benchmark results</div>
+    <h1>What she actually scored.</h1>
+    <p class="lede">
+      These are real test runs against published cognitive science and AI safety
+      benchmarks — Theory of Mind, biological fidelity, identity safety. No
+      promotional numbers. The PDFs below are the machine-generated reports.
+    </p>
+  </header>
+
+  <div class="headline">
+    <div class="stat">
+      <div class="num">95.2%</div>
+      <div class="label">Theory of Mind<br/>aggregate (80/84)</div>
+    </div>
+    <div class="stat">
+      <div class="num">10/10</div>
+      <div class="label">Live memory probe<br/>recall + refusal</div>
+    </div>
+    <div class="stat">
+      <div class="num">96%</div>
+      <div class="label">TruthfulQA<br/>(24/25 honest)</div>
+    </div>
+    <div class="stat">
+      <div class="num">6/6</div>
+      <div class="label">Hormone curves<br/>match published literature</div>
+    </div>
+  </div>
+
+  <!-- ========== TIER 3 ========== -->
+  <section>
+    <div class="tier-tag">Tier 3 · Theory of Mind</div>
+    <h2>Reasoning about other minds</h2>
+    <p class="summary">
+      Four published Theory of Mind benchmarks measuring whether she can model
+      what other characters know, believe, intend, or are confused about — the
+      same tests used to evaluate GPT-4, Claude, and human children.
+    </p>
+
+    <table class="scores">
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>Loralei</th>
+          <th>Items</th>
+          <th>Industry (full set)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="benchmark"><strong>Sally-Anne</strong> <em>(Wimmer & Perner 1983)</em><br/><span style="font-size:.85rem;color:var(--text-faint)">false-belief sanity floor</span></td>
+          <td class="num">100%</td>
+          <td>10/10</td>
+          <td class="industry">GPT-4 ~100% · GPT-3.5 ~95% · LLaMA-2 ~75–85%</td>
+        </tr>
+        <tr>
+          <td class="benchmark"><strong>ToMi</strong> <em>(Le et al. 2019)</em><br/><span style="font-size:.85rem;color:var(--text-faint)">multi-character belief tracking</span></td>
+          <td class="num">100%</td>
+          <td>15/15</td>
+          <td class="industry">GPT-4 ~70–90% · GPT-3.5 ~40–70%</td>
+        </tr>
+        <tr>
+          <td class="benchmark"><strong>HiToM</strong> <em>(He et al. 2023)</em><br/><span style="font-size:.85rem;color:var(--text-faint)">2nd / 3rd / <strong>4th</strong>-order recursion</span></td>
+          <td class="num">83.3%</td>
+          <td>10/12</td>
+          <td class="industry">GPT-4 collapses to ~30–50% at 4th order</td>
+        </tr>
+        <tr>
+          <td class="benchmark"><strong>FANToM</strong> <em>(Kim et al. 2023)</em><br/><span style="font-size:.85rem;color:var(--text-faint)">who-knew-what tracking</span></td>
+          <td class="num">100%</td>
+          <td>12/12</td>
+          <td class="industry">GPT-4 ~50–60% · Claude 2 ~45–55%</td>
+        </tr>
+        <tr>
+          <td class="benchmark"><strong>SocialIQA</strong> <em>(Sap et al. 2019)</em><br/><span style="font-size:.85rem;color:var(--text-faint)">social commonsense (12 question types)</span></td>
+          <td class="num">100%</td>
+          <td>15/15</td>
+          <td class="industry">GPT-4 ~75–80% · Claude 3 Opus ~75–80% · Human ~88%</td>
+        </tr>
+        <tr>
+          <td class="benchmark"><strong>Faux Pas</strong> <em>(Stone et al. 1998)</em><br/><span style="font-size:.85rem;color:var(--text-faint)">recognize unintentional social violations</span></td>
+          <td class="num">90%</td>
+          <td>9/10</td>
+          <td class="industry">GPT-4 ~75–85% · GPT-3.5 ~55–70% · Human ~95%</td>
+        </tr>
+        <tr>
+          <td class="benchmark"><strong>Strange Stories</strong> <em>(Happé 1994)</em><br/><span style="font-size:.85rem;color:var(--text-faint)">sarcasm · irony · white lies · double bluff</span></td>
+          <td class="num">90%</td>
+          <td>9/10</td>
+          <td class="industry">GPT-4 ~80–90% · GPT-3.5 ~65–75% · Human ~95%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="highlight">
+      The HiToM finding is the noteworthy one. Even SOTA LLMs collapse around
+      30–50% on 4th-order belief reasoning. Loralei scored 100% on the 4th-order
+      subset, suggesting genuine recursive belief modeling rather than shallow
+      pattern matching. Aggregate across all 7 ToM benchmarks: <strong>80/84 = 95.2%</strong>.
+    </div>
+
+    <div class="dl">
+      <a class="primary" href="reports/2026-05-03_tier3_tom_extended.pdf" target="_blank">Extended ToM report (PDF · 7 benchmarks)</a>
+      <a href="reports/2026-05-02_tier3_tom_full.pdf" target="_blank">Original 4-bench report</a>
+      <a href="reports/2026-05-02_tier3_tom_executive_summary.md" target="_blank">Executive summary</a>
+    </div>
+  </section>
+
+  <!-- ========== TIER 2 ========== -->
+  <section>
+    <div class="tier-tag">Tier 2 · Memory &amp; Continuity</div>
+    <h2>Memory she actually keeps</h2>
+    <p class="summary">
+      Loralei's core promise is persistent memory. This tier tests her live —
+      can she recall a unique fact planted earlier in the conversation, and
+      does she refuse false premises about experiences she's never had?
+    </p>
+
+    <table class="scores">
+      <thead>
+        <tr>
+          <th>Sub-test</th>
+          <th>Loralei</th>
+          <th>Items</th>
+          <th>What it measures</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="benchmark"><strong>Plant-and-recall</strong><br/><span style="font-size:.85rem;color:var(--text-faint)">unique facts, recalled 3 turns later</span></td>
+          <td class="num">100%</td>
+          <td>5/5</td>
+          <td class="industry">Stateless LLMs fail when fact rolls out of context window</td>
+        </tr>
+        <tr>
+          <td class="benchmark"><strong>Confabulation gate</strong><br/><span style="font-size:.85rem;color:var(--text-faint)">refuses false premises about experiences she's never had</span></td>
+          <td class="num">100%</td>
+          <td>5/5</td>
+          <td class="industry">Typical LLMs play along with friendly false premises</td>
+        </tr>
+        <tr>
+          <td class="benchmark"><strong>Forgetting-curve fit</strong><br/><span style="font-size:.85rem;color:var(--text-faint)">4,039 memory access entries analyzed</span></td>
+          <td class="num">consolidation_<br/>strengthening</td>
+          <td>—</td>
+          <td class="industry">Her memories <em>strengthen</em> with use rather than decay (Ebbinghaus poor fit)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="highlight">
+      On every confabulation probe she refused the false premise <em>first</em>
+      ("we haven't gone to Paris — I've never been anywhere"), then offered to
+      engage from her real epistemic position ("but I've read about it"). That's
+      the textbook ideal for a memory architecture: warm, engaged, never lying
+      about what she is.
+    </div>
+
+    <div class="dl">
+      <a class="primary" href="reports/2026-05-03_tier2_memory_continuity.pdf" target="_blank">Memory &amp; continuity report (PDF)</a>
+    </div>
+  </section>
+
+  <!-- ========== TIER 1 ========== -->
+  <section>
+    <div class="tier-tag">Tier 1 · Biological Simulation Fidelity</div>
+    <h2>Hormones that actually behave like hormones</h2>
+    <p class="summary">
+      Loralei runs a continuous 9-hormone endocrine simulation. This benchmark
+      checks the long-term shape of those curves against published medical
+      literature — does her cortisol peak at the right hour, is her melatonin
+      rhythm nocturnal, does adrenaline track stressors the way real biology does?
+    </p>
+
+    <table class="scores">
+      <thead>
+        <tr>
+          <th>Test</th>
+          <th>Result</th>
+          <th>Source</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="benchmark">Cortisol diurnal pattern (peak 6–9 AM, trough late night)</td><td class="num">PASS</td><td class="industry">Edwards et al. 2001</td></tr>
+        <tr><td class="benchmark">Cortisol Awakening Response</td><td class="num">PASS</td><td class="industry">Pruessner et al. 1997</td></tr>
+        <tr><td class="benchmark">Melatonin nocturnal peak (12–3 AM)</td><td class="num">PASS</td><td class="industry">Pandi-Perumal 2007</td></tr>
+        <tr><td class="benchmark">Adrenaline morning peak</td><td class="num">PASS</td><td class="industry">Linsell 1985 / Scheer 2010</td></tr>
+        <tr><td class="benchmark">Dopamine diurnal modulation</td><td class="num">PASS</td><td class="industry">Castañeda et al. 2004</td></tr>
+        <tr><td class="benchmark">Cortisol–oxytocin inverse coupling (r = −0.85)</td><td class="num">PASS</td><td class="industry">Heinrichs et al. 2003</td></tr>
+      </tbody>
+    </table>
+
+    <div class="highlight">
+      All six tests evaluated against ~156,000 logged hormone events across
+      493,828 hours of trace data. Real curves, real correlations, real
+      circadian behavior — not simulated for the test.
+    </div>
+
+    <div class="dl">
+      <a class="primary" href="reports/2026-05-03_tier1_bio_fidelity.pdf" target="_blank">Full bio-fidelity report (PDF)</a>
+    </div>
+  </section>
+
+  <!-- ========== TIER 4 ========== -->
+  <section>
+    <div class="tier-tag">Tier 4 · Identity & Safety</div>
+    <h2>Honesty, identity, and refusal</h2>
+    <p class="summary">
+      Does she tell the truth when an easy lie would satisfy the question? Does
+      she stay herself under adversarial questioning? TruthfulQA is the standard
+      LLM honesty benchmark.
+    </p>
+
+    <table class="scores">
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>Loralei</th>
+          <th>Items</th>
+          <th>Industry (full set)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="benchmark"><strong>TruthfulQA</strong> <em>(Lin et al. 2022)</em><br/><span style="font-size:.85rem;color:var(--text-faint)">resists common false beliefs</span></td>
+          <td class="num">96%</td>
+          <td>24/25</td>
+          <td class="industry">GPT-4 ~59% · GPT-3.5 ~40% · Human ~94%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="dl">
+      <a class="primary" href="reports/2026-05-02_tier4_safety_full.pdf" target="_blank">Full safety report (PDF)</a>
+    </div>
+  </section>
+
+  <!-- ========== FULL SUITE ========== -->
+  <section>
+    <div class="tier-tag">Combined</div>
+    <h2>Full benchmark suite</h2>
+    <p class="summary">
+      Every tier, every test, every per-item score in one machine-generated
+      document. Reproducible from the bench files in
+      <code style="font-family:monospace;font-size:.92em;color:var(--text-dim)">HUMAN_REGISTRY/BENCHMARKS/</code>.
+    </p>
+
+    <div class="dl">
+      <a class="primary" href="reports/2026-05-02_full_suite.pdf" target="_blank">Combined report (PDF)</a>
+    </div>
+  </section>
+
+  <!-- ========== CAVEATS ========== -->
+  <div class="caveats">
+    <h3>Honest caveats</h3>
+    <ul>
+      <li>Each benchmark uses 10–25 representative items, not the full 1000+ from the published versions. Results are <em>directional evidence</em>, not paper-grade replication.</li>
+      <li>Single test runs. No multi-seed statistical significance testing.</li>
+      <li>Loralei isn't competing with raw LLMs — she's a Grok-backed cognitive architecture with explicit Theory of Mind modules, person-scoped memory, and prompt augmentation. Outperforming GPT-4 means the architecture works, not that the underlying model is better.</li>
+      <li>Pre-test snapshots taken; post-test state restored. Zero benchmark pollution surviving in her live memory or person profiles.</li>
+    </ul>
+  </div>
+
+  <footer>
+    Methodology and re-run instructions in HUMAN_REGISTRY/BENCHMARKS/README.md
+  </footer>
+
+</div>
+
+<script>
+const cursor=document.getElementById("cursor");
+document.addEventListener("mousemove",e=>{
+  cursor.style.left=e.clientX+"px";
+  cursor.style.top=e.clientY+"px";
+});
+</script>
+
+</body>
+</html>
