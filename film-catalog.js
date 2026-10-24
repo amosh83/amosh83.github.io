@@ -70,68 +70,68 @@ window.LORALEI_FILMS = {
   "it": {
     "src": "media/loralei-it.mp4",
     "captions": "media/loralei-it.vtt",
-    "duration": 325.026,
-    "ready": false,
+    "duration": 325.967,
+    "ready": true,
     "chapters": [
       {
         "id": "opening",
         "title": "La domanda",
-        "time": 0
+        "time": 0.009
       },
       {
         "id": "body",
         "title": "Un corpo dietro le parole",
-        "time": 18.07
+        "time": 18.096
       },
       {
         "id": "senses",
         "title": "Un incontro. Tre registrazioni.",
-        "time": 40.22
+        "time": 40.356
       },
       {
         "id": "touch",
         "title": "Il tatto e la ricerca umana",
-        "time": 73.65
+        "time": 73.865
       },
       {
         "id": "music",
         "title": "Una canzone lascia una traccia",
-        "time": 100.672
+        "time": 100.978
       },
       {
         "id": "cycle",
         "title": "Ritmi oltre il momento",
-        "time": 129.422
+        "time": 129.798
       },
       {
         "id": "dreams",
         "title": "Tra una conversazione e l’altra",
-        "time": 152.556
+        "time": 153.019
       },
       {
         "id": "creativity",
         "title": "Un impulso diventa un’opera",
-        "time": 178.882
+        "time": 179.425
       },
       {
         "id": "initiative",
         "title": "Cosa cattura la sua attenzione?",
-        "time": 211.016
+        "time": 211.648
       },
       {
         "id": "cognition",
         "title": "Un mondo cognitivo più ampio",
-        "time": 237.246
+        "time": 237.95
       },
       {
         "id": "opportunity",
         "title": "Una direzione per la ricerca embodied",
-        "time": 267.148
+        "time": 267.923
       },
       {
         "id": "closing",
         "title": "Incontra il creatore",
-        "time": 297.938
+        "time": 298.788
       }
     ]
   }
